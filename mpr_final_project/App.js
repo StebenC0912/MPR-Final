@@ -7,8 +7,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import IntroScreen from './screens/IntroScreen';
 import PickGenderScreen from './screens/PickGenderScreen';
-
+import AuthenticationScreen from './screens/authenticationScreen';
 const Stack = createStackNavigator();
+
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -31,6 +32,7 @@ export default function App() {
       {/* <View style={styles.container} onLayout={onLayoutRootView}> */}
           <Stack.Navigator initialRouteName="Intro">
             <Stack.Screen name="Intro" component={IntroScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="authentication" component={AuthenticationScreen} options={{headerShown: false}}/>
             <Stack.Screen name="PickGender" component={PickGenderScreen} options={{headerShown: false}}/>
           </Stack.Navigator>
       {/* </View> */}

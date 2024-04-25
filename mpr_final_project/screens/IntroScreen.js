@@ -13,7 +13,7 @@ const IntroScreen = ({navigation}) => {
         <Button
           title="Start"
           onPress={() =>
-            navigation.navigate('PickGender')
+            navigation.navigate('authentication')
           }
         />
       </View>
