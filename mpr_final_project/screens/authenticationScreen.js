@@ -93,14 +93,14 @@ export default function AuthenticationScreen({ navigation }) {
     try {
       if (user) {
         // If user is already authenticated, log out
-        navigation.navigate("PickGender");
+        navigation.navigate("CreateCharacter");
       } else {
         // Sign in or sign up
         if (isLogin) {
           // Sign in
           await signInWithEmailAndPassword(auth, email, password);
           console.log("User signed in successfully!");
-          navigation.navigate("PickGender");
+          navigation.navigate("CreateCharacter");
         } else {
           // Sign up
           await createUserWithEmailAndPassword(auth, email, password);

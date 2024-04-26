@@ -6,7 +6,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import IntroScreen from './screens/IntroScreen';
-import PickGenderScreen from './screens/PickGenderScreen';
+import CreateCharacter from './screens/createCharacter';
 import AuthenticationScreen from './screens/authenticationScreen';
 const Stack = createStackNavigator();
 
@@ -33,7 +33,7 @@ export default function App() {
           <Stack.Navigator initialRouteName="Intro">
             <Stack.Screen name="Intro" component={IntroScreen} options={{headerShown: false}}/>
             <Stack.Screen name="authentication" component={AuthenticationScreen} options={{headerShown: false}}/>
-            <Stack.Screen name="PickGender" component={PickGenderScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="CreateCharacter" component={CreateCharacter} options={{headerShown: false}}/>
           </Stack.Navigator>
       {/* </View> */}
     </NavigationContainer>
