@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Make sure to install these or use similar icons available to you
 const ProgressBar = ({ progress, color }) => {
@@ -8,8 +8,34 @@ const ProgressBar = ({ progress, color }) => {
       </View>
     );
   };
-const MainScreen = ({navigation}) => {
+  
+const MainScreen = ({navigation, route}) => {
+    const [age, setAge] = useState(0); // Initializing age state
+    const [progress, setProgress] = useState(0);
+    const { name } = route.params;
+    const [bankBalance, setBankBalance] = useState(0);
+
+    useEffect(() => {
+        const secondTimer = setInterval(() => {
+            setProgress(prevProgress => {
+                const newProgress = prevProgress + 100 / (1 * 60); // Increment by the fraction per second
+                if (newProgress >= 100) {
+                    setAge(prevAge => prevAge + 1); // Increment age every 12 minutes
+                    return 0; // Reset progress after 12 minutes
+                }
+                return newProgress;
+            });
+        }, 1000); // Update every second
+
+        return () => clearInterval(secondTimer); // Clean up the interval on component unmount
+    }, []);
+
+    const handleIncreaseAge = () => {
+        setAge(age + 1); // Manual increment age
+    };
+
   return (
+    
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         
@@ -22,20 +48,18 @@ const MainScreen = ({navigation}) => {
           source={{ uri: 'https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg' }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>Linda Ngo</Text>
-     
-        <Text style={styles.bankBalance}>Bank Balance: $0</Text>
+     <Text style={styles.profileName}>{name}</Text>
+        <Text style={styles.Age}>Age: {age}</Text> 
+        <Text style={styles.bankBalance}>Bank Balance: ${bankBalance}</Text>
       </View>
 
       <View style={styles.detailsSection}>
         <Text>Age: 0 years</Text>
-        <Text>I was born a male in American. I was a planned pregnancy.</Text>
-        <Text>My birthday is June 23. I am a Cancer.</Text>
-        <Text>My name is LindaNgo.</Text>
-        <Text>My mother is Xiaosheng Tau, a trucker (age 27)</Text>
-        <Text>My father is Bean, a software engineer.</Text>
+        
       </View>
-
+      <View style={styles.timeBarContainer}>
+                <ProgressBar progress={progress} color="#3498db" />
+            </View>
       <View style={styles.statsSection}>
         <View style={styles.stat}>
           <Text style={styles.statLabel}>Happy</Text>
@@ -67,10 +91,10 @@ const MainScreen = ({navigation}) => {
         </TouchableOpacity>
 
 
-  <TouchableOpacity style={styles.navItem} onPress={() => {/* Navigation logic for Heart */}}>
-    <FontAwesome5 name="plus" size={24} color="white" />
-    <Text style={styles.navText}>Age</Text>
-  </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={handleIncreaseAge}>
+                    <FontAwesome5 name="plus" size={24} color="white" />
+                    <Text style={styles.navText}>Age</Text>
+          </TouchableOpacity>
 
   <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Relationship')}>
           <FontAwesome5 name="user-friends" size={24} color="white" />
@@ -140,7 +164,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0', // Light grey border
   },
-  
+  timeBarContainer: {
+    height: 20, // Set the height for the time progress bar container
+    width: '100%', // Set the width to full container width
+    backgroundColor: '#ddd', // A light background color for the progress bar background
+},
   statsSection: {
     paddingVertical: 10,
     paddingHorizontal: 20,
