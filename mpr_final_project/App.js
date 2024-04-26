@@ -4,15 +4,19 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { StatProvider } from './store/StatContext';
+
 
 import IntroScreen from './screens/IntroScreen';
 import CreateCharacter from './screens/createCharacter';
 import AuthenticationScreen from './screens/authenticationScreen';
 import MainScreen from './screens/MainScreen';
-import School from './screens/School';
-import Relationship from './screens/Relationship';
-import Assert from './screens/Assert';
-import Activity from './screens/Activity';
+import School from './screens/School/School';
+import Relationship from './screens/Relationship/Relationship';
+import Assert from './screens/Assert/Assert';
+import Activity from './screens/Activity/Activity';
+import Subject from './screens/School/Subject';
+
 const Stack = createStackNavigator();
 
 
@@ -35,6 +39,7 @@ export default function App() {
   return (
     <NavigationContainer onLayout={onLayoutRootView}>
       {/* <View style={styles.container} onLayout={onLayoutRootView}> */}
+      <StatProvider>
           <Stack.Navigator initialRouteName="Intro">
             <Stack.Screen name="Intro" component={IntroScreen} options={{headerShown: false}}/>
             <Stack.Screen name="authentication" component={AuthenticationScreen} options={{headerShown: false}}/>
@@ -44,7 +49,9 @@ export default function App() {
             <Stack.Screen name="Activity" component={Activity} />
             <Stack.Screen name="Relationship" component={Relationship} />
             <Stack.Screen name="Assert" component={Assert} />
+            <Stack.Screen name="Subject" component={Subject}/>
             </Stack.Navigator>
+      </StatProvider>
       {/* </View> */}
     </NavigationContainer>
   );
