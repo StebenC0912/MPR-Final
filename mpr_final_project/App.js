@@ -8,6 +8,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import IntroScreen from './screens/IntroScreen';
 import CreateCharacter from './screens/createCharacter';
 import AuthenticationScreen from './screens/authenticationScreen';
+import MainScreen from './screens/MainScreen';
+import School from './screens/School';
+import Relationship from './screens/Relationship';
+import Assert from './screens/Assert';
+import Activity from './screens/Activity';
 const Stack = createStackNavigator();
 
 
@@ -34,7 +39,12 @@ export default function App() {
             <Stack.Screen name="Intro" component={IntroScreen} options={{headerShown: false}}/>
             <Stack.Screen name="authentication" component={AuthenticationScreen} options={{headerShown: false}}/>
             <Stack.Screen name="CreateCharacter" component={CreateCharacter} options={{headerShown: false}}/>
-          </Stack.Navigator>
+            <Stack.Screen name="Main" component={MainScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="School" component={School} />
+            <Stack.Screen name="Activity" component={Activity} />
+            <Stack.Screen name="Relationship" component={Relationship} />
+            <Stack.Screen name="Assert" component={Assert} />
+            </Stack.Navigator>
       {/* </View> */}
     </NavigationContainer>
   );

@@ -24,7 +24,7 @@ const CreateCharacter = ({ navigation, route }) => {
     if (pickedGender === "") {
       Alert.alert("Please choose a gender")
     }
-
+    navigation.navigate('Main');
   }
   return (
     <View style={styles.container}>
