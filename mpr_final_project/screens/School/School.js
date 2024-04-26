@@ -59,44 +59,44 @@ const School = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20,
-      backgroundColor: '#ecf0f1',
-  },
-  header: {
-      marginBottom: 20,
-      padding: 10,
-      backgroundColor: '#ffffff', // Light background for the header
-      borderRadius: 5,
-      shadowColor: "#000",
-      shadowOffset: {
-          width: 0,
-          height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
-      width: '100%', // Full width to maintain consistency
-      alignItems: 'center', // Center alignment for the text
-  },
-  headerText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#34495e',
-      textAlign: 'center', // Center text for better readability
-  },
-  button: {
-      padding: 10,
-      backgroundColor: '#3498db',
-      borderRadius: 5,
-  },
-  buttonText: {
-      color: '#ffffff',
-      fontSize: 16,
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#ecf0f1',
+    },
+    header: {
+        marginBottom: 20,
+        padding: 10,
+        backgroundColor: '#ffffff', // Light background for the header
+        borderRadius: 5,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width: '100%', // Full width to maintain consistency
+        alignItems: 'center', // Center alignment for the text
+    },
+    headerText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#34495e',
+        textAlign: 'center', // Center text for better readability
+    },
+    button: {
+        padding: 10,
+        backgroundColor: '#3498db',
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: '#ffffff',
+        fontSize: 16,
+    },
 });
 
 export default School;

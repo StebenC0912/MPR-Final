@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { StatContext } from '../../store/StatContext';  // Make sure this is the correct path to your StatContext
 
 const ProgressBar = ({ progress, color }) => {
     return (
@@ -10,11 +9,11 @@ const ProgressBar = ({ progress, color }) => {
     );
 };
 
-const Subject = ({ route }) => {
+const Subject = ({ route, navigation }) => {
     const { subjects = [], onCompleteStage } = route.params || {};
-    const { modifyStats } = useContext(StatContext);  // Using StatContext to modify stats globally
     const [subjectProgress, setSubjectProgress] = useState(subjects.map(() => 0));
 
+    // Check if all subjects are completed and call onCompleteStage if they are
     useEffect(() => {
         if (subjectProgress.every(progress => progress === 100)) {
             onCompleteStage();  // This function should be passed from School.js to handle stage completion
@@ -27,7 +26,6 @@ const Subject = ({ route }) => {
             newProgress[index] = Math.min(newProgress[index] + 3, 100); // Increase by 3%, cap at 100%
             return newProgress;
         });
-        modifyStats({ happy: 0, health: -1, smart: 5, look: -1 });  // Modifying stats according to the study action
     };
 
     return (

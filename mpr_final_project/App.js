@@ -4,8 +4,6 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StatProvider } from './store/StatContext';
-
 
 import IntroScreen from './screens/IntroScreen';
 import CreateCharacter from './screens/createCharacter';
@@ -39,7 +37,6 @@ export default function App() {
   return (
     <NavigationContainer onLayout={onLayoutRootView}>
       {/* <View style={styles.container} onLayout={onLayoutRootView}> */}
-      <StatProvider>
           <Stack.Navigator initialRouteName="Intro">
             <Stack.Screen name="Intro" component={IntroScreen} options={{headerShown: false}}/>
             <Stack.Screen name="authentication" component={AuthenticationScreen} options={{headerShown: false}}/>
@@ -50,8 +47,8 @@ export default function App() {
             <Stack.Screen name="Relationship" component={Relationship} />
             <Stack.Screen name="Assert" component={Assert} />
             <Stack.Screen name="Subject" component={Subject}/>
+            
             </Stack.Navigator>
-      </StatProvider>
       {/* </View> */}
     </NavigationContainer>
   );
