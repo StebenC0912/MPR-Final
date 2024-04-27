@@ -48,7 +48,11 @@ const ProgressBar = ({ progress, color }) => {
   // Use a callback to increment age to encapsulate the condition checking
   const incrementAge = useCallback(() => {
       setAge(prevAge => {
+        
           const newAge = prevAge + 1;
+          if (newAge === 18) {
+            modifyBankBalance(10000);  // Add $10,000 when age reaches 18
+        }
           // Move the side effects to an effect hook
           if (newAge > 35) {
               // Delay this update to the next effect cycle

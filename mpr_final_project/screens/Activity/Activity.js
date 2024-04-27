@@ -14,7 +14,7 @@ const Activity = () => {
   const { modifyStats, modifyBankBalance } = useStats(); // Use the context hook to access functionality
 
   const handleHospitalVisit = () => {
-    modifyBankBalance(-250); // Subtract $250 from bank balance
+    modifyBankBalance(-500); // Subtract $250 from bank balance
     modifyStats({ health: 20 }); // Increase health by 20%
   };
 
