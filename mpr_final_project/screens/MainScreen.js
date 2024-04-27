@@ -53,7 +53,7 @@ const ProgressBar = ({ progress, color }) => {
           if (newAge > 35) {
               // Delay this update to the next effect cycle
               requestAnimationFrame(() => {
-                  modifyStats({ health: -2 });
+                  modifyStats({ health: -2, happy: +0, smart: +0, look: +0 });
               });
           }
           return newAge;
