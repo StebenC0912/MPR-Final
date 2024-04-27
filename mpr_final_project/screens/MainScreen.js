@@ -98,11 +98,15 @@ const ProgressBar = ({ progress, color }) => {
             </View>
           )}
         />
-      </View> 
-            <View style={styles.timeBarContainer}>
-                <ProgressBar progress={progress} color="#3498db" />
-            </View>
-            <View style={styles.statsSection}>
+
+    
+      </View>
+
+      <View style={styles.timeBarContainer}>
+        <ProgressBar progress={progress} color="#3498db" />
+      </View>
+      <View style={styles.statsSection}>
+
         <View style={styles.stat}>
           <Text style={styles.statLabel}>Happy</Text>
           <ProgressBar progress={stats.happy} color="#ffeb3b" />
