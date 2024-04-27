@@ -1,21 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import { useStats } from '../../store/StatContext'; // Adjust the path as necessary
 
-const ProgressBar = ({ progress, color }) => {
-  return (
-    <View style={styles.progressBarBackground}>
-      <View style={[styles.progressBarForeground, { width: `${progress}%`, backgroundColor: color }]} />
-    </View>
-  );
-};
-
 const Activity = () => {
-  const { modifyStats, modifyBankBalance } = useStats(); // Use the context hook to access functionality
+  const { modifyStats, modifyBankBalance } = useStats();
+  const navigation = useNavigation(); // Use the navigation hook
 
   const handleHospitalVisit = () => {
-    modifyBankBalance(-500); // Subtract $250 from bank balance
+    modifyBankBalance(-500); // Subtract $500 from bank balance
     modifyStats({ health: 20 }); // Increase health by 20%
+  };
+
+  const handleShoppingPress = () => {
+    navigation.navigate('Shop'); // Navigate to Shop screen
   };
 
   return (
@@ -27,7 +25,9 @@ const Activity = () => {
         <TouchableOpacity onPress={handleHospitalVisit}>
           <Text style={styles.label}>Hospital</Text>
         </TouchableOpacity>
-        <Text style={styles.label}>Shopping</Text>
+        <TouchableOpacity onPress={handleShoppingPress}>
+          <Text style={styles.label}>Shopping</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

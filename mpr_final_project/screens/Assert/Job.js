@@ -1,18 +1,21 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const Assert = ({ navigation }) => {
+const Job = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Assert</Text>
+        <Text style={styles.headerText}>Job Opportunities</Text>
       </View>
       <View style={styles.content}>
-        <TouchableOpacity onPress={() => navigation.navigate('Job')}>
-          <Text style={styles.label}>Job</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('JobDetails', { jobId: 1 })}>
+          <Text style={styles.jobLabel}>Software Developer</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('PartJob')}>
-          <Text style={styles.label}>Part-time Job</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('JobDetails', { jobId: 2 })}>
+          <Text style={styles.jobLabel}>Data Scientist</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('JobDetails', { jobId: 3 })}>
+          <Text style={styles.jobLabel}>Product Manager</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -38,14 +41,15 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
   },
-  label: {
+  jobLabel: {
     fontSize: 18,
     color: '#34495e',
     paddingVertical: 10,
     backgroundColor: '#ccc',
     padding: 10,
     marginVertical: 5,
+    textAlign: 'center',
   },
 });
 
-export default Assert;
+export default Job;

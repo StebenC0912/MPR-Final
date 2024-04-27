@@ -1,102 +1,153 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage mới
 
-const ProgressBar = ({ progress, color }) => {
+const School = ({ navigation }) => {
+  const [currentLevel, setCurrentLevel] = useState(0); // State để lưu trữ cấp học hiện tại
+  const [schools, setSchools] = useState([
+    {
+      name: 'Tiểu học',
+      subjects: ['Toán', 'Văn', 'Anh'],
+      completed: [false, false, false],
+      isCompleted: false // Trạng thái hoàn thành của cấp học
+    },
+    {
+      name: 'Trung học cơ sở',
+      subjects: ['Toán', 'Văn', 'Anh', 'Khoa Học'],
+      completed: [false, false, false, false],
+      isCompleted: false
+    },
+    {
+      name: 'Trung học phổ thông',
+      subjects: ['Toán', 'Văn', 'Anh', 'Khoa Học', 'Xã hội'],
+      completed: [false, false, false, false, false],
+      isCompleted: false
+    },
+    {
+      name: 'Đại học',
+      subjects: ['Nguyên lí máy tính', 'Lập Trình', 'Triết học'],
+      completed: [false, false, false],
+      isCompleted: false
+    },
+  ]);
+
+  useEffect(() => {
+    // Khi component được render, kiểm tra xem đã lưu trạng thái cấp học trước đó không
+    retrieveLevel();
+  }, []);
+
+  useEffect(() => {
+    // Mỗi khi currentLevel thay đổi, lưu trạng thái cấp học mới
+    saveLevel();
+  }, [currentLevel]);
+
+  // Hàm lấy trạng thái cấp học từ AsyncStorage
+  const retrieveLevel = async () => {
+    try {
+      const level = await AsyncStorage.getItem('currentLevel');
+      if (level !== null) {
+        setCurrentLevel(parseInt(level));
+      }
+    } catch (error) {
+      console.error('Error retrieving saved level: ', error);
+    }
+  };
+
+  // Hàm lưu trạng thái cấp học vào AsyncStorage
+  const saveLevel = async () => {
+    try {
+      await AsyncStorage.setItem('currentLevel', currentLevel.toString());
+    } catch (error) {
+      console.error('Error saving level: ', error);
+    }
+  };
+
+  const handleSubjectPress = (schoolIndex, subjectIndex) => {
+    const updatedSchools = [...schools];
+    updatedSchools[schoolIndex].completed[subjectIndex] = true;
+
+    // Kiểm tra xem cấp học hiện tại đã hoàn thành chưa
+    const isLevelCompleted = updatedSchools[currentLevel].subjects.every(
+      (_, index) => updatedSchools[currentLevel].completed[index]
+    );
+
+    // Nếu đã hoàn thành, chuyển sang cấp học tiếp theo
+    if (isLevelCompleted && currentLevel < schools.length - 1) {
+      setCurrentLevel(currentLevel + 1);
+      updatedSchools[currentLevel + 1].isCompleted = true;
+    }
+
+    setSchools(updatedSchools);
+  };
+
   return (
-    <View style={styles.progressBarContainer}>
-      <View style={[styles.progressBar, { width: `${progress}%`, backgroundColor: color }]} />
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>School</Text>
+      </View>
+      <View style={styles.content}>
+        {schools.map((school, schoolIndex) => (
+          // Hiển thị chỉ các cấp học đã hoàn thành hoặc cấp học hiện tại
+          (school.isCompleted || schoolIndex === currentLevel) && (
+            <View key={schoolIndex} style={styles.schoolContainer}>
+              <Text style={styles.schoolName}>{school.name}</Text>
+              {school.subjects.map((subject, subjectIndex) => (
+                <TouchableOpacity
+                  key={subjectIndex}
+                  style={[
+                    styles.subjectButton,
+                    { backgroundColor: school.completed[subjectIndex] ? '#4CAF50' : '#3498db' }
+                  ]}
+                  onPress={() => handleSubjectPress(schoolIndex, subjectIndex)}
+                >
+                  <Text style={styles.subjectButtonText}>{subject}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )
+        ))}
+      </View>
     </View>
   );
 };
 
-
-const School = ({ navigation }) => {
-    const [currentStage, setCurrentStage] = useState(0);
-    const [progress, setProgress] = useState(0);
-
-    const stages = [
-        { level: "Elementary School", subjects: ["Mathematics", "Literature", "English"] },
-        { level: "Middle School", subjects: ["Mathematics", "Literature", "English", "Science"] },
-        { level: "High School", subjects: ["Mathematics", "Literature", "English", "Science", "Social Studies"] },
-        { level: "University", subjects: ["Computer Principles", "Programming", "Philosophy"] }
-    ];
-
-    const incrementProgress = () => {
-        const maxProgress = stages[currentStage].subjects.length;
-        if (progress < maxProgress - 1) {
-            setProgress(progress + 1);
-        } else if (currentStage < stages.length - 1) {
-            setCurrentStage(currentStage + 1);
-            setProgress(0);
-        }
-    };
-
-    // Function to handle completion of all subjects in the current stage
-    const handleCompleteStage = () => {
-        if (currentStage < stages.length - 1) {
-            setCurrentStage(currentStage + 1);
-            setProgress(0); // Reset progress for the new stage
-        }
-    };
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Current Educational Stage: {stages[currentStage].level}</Text>
-            </View>
-            <ProgressBar progress={(progress / stages[currentStage].subjects.length) * 100} color="#4caf50" />
-            <TouchableOpacity 
-                style={styles.button}
-                onPress={() => navigation.navigate('Subject', {
-                    subjects: stages[currentStage].subjects,
-                    onCompleteStage: handleCompleteStage
-                })}
-            >
-                <Text style={styles.buttonText}>Go to Subjects</Text>
-            </TouchableOpacity>
-        </View>
-    );
-};
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#ecf0f1',
-    },
-    header: {
-        marginBottom: 20,
-        padding: 10,
-        backgroundColor: '#ffffff', // Light background for the header
-        borderRadius: 5,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-        width: '100%', // Full width to maintain consistency
-        alignItems: 'center', // Center alignment for the text
-    },
-    headerText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#34495e',
-        textAlign: 'center', // Center text for better readability
-    },
-    button: {
-        padding: 10,
-        backgroundColor: '#3498db',
-        borderRadius: 5,
-    },
-    buttonText: {
-        color: '#ffffff',
-        fontSize: 16,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#ecf0f1',
+  },
+  header: {
+    backgroundColor: '#34495e',
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  schoolContainer: {
+    marginBottom: 20,
+  },
+  schoolName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  subjectButton: {
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  subjectButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+  },
 });
 
 export default School;

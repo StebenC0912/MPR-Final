@@ -17,10 +17,8 @@ const initialState = {
 // Action types for context updates
 const MODIFY_STATS = 'MODIFY_STATS';
 const UPDATE_BANK_BALANCE = 'UPDATE_BANK_BALANCE';
-const SET_SUBJECT_PROGRESS = 'SET_SUBJECT_PROGRESS';
-const RESET_SUBJECT_PROGRESS = 'RESET_SUBJECT_PROGRESS';
 const INCREMENT_TIME = 'INCREMENT_TIME'; // New action for incrementing time
-
+const INCREMENT_AGE = 'INCREMENT_AGE';
 // Reducer to handle actions
 function statReducer(state, action) {
   switch (action.type) {
@@ -37,44 +35,33 @@ function statReducer(state, action) {
         ...state,
         bankBalance: state.bankBalance + action.payload
       };
-    case SET_SUBJECT_PROGRESS:
+    case INCREMENT_TIME:
+      const newTime = state.time + action.payload;
+      const newAge = state.age + Math.floor(newTime / 12) - Math.floor(state.time / 12);
+      let newHealth = state.health;
+      let newBankBalance = state.bankBalance;
+
+      // Increment bank balance when reaching 18 years old
+      if (newAge === 18) {
+        newBankBalance += 10000; // adjust as necessary
+      }
+
+      // Decrement health by 2% for each year over 35
+      if (newAge > 35) {
+        newHealth *= 0.98; // Reduces health to 98% of previous value
+      }
+
       return {
         ...state,
-        subjectProgress: {
-          ...state.subjectProgress,
-          [action.payload.subject]: action.payload.progress
-        }
+        time: newTime,
+        age: newAge,
+        health: Math.min(100, Math.max(0, newHealth)),
+        bankBalance: newBankBalance
       };
-    case RESET_SUBJECT_PROGRESS:
-      return {
-        ...state,
-        subjectProgress: {
-          ...state.subjectProgress,
-          [action.payload.subject]: 0
-        }
-      };
-      case INCREMENT_TIME:
-        const newTime = state.time + action.payload;
-        const newAge = state.age + Math.floor(newTime / 12) - Math.floor(state.time / 12);
-        let newHealth = state.health;
-        let newBankBalance = state.bankBalance;
-  
-        // Increment bank balance when reaching 18 years old
-        if (newAge === 18) {
-          newBankBalance += 10000; // adjust as necessary
-        }
-  
-        // Decrement health by 2% for each year over 35
-        if (newAge > 35) {
-          newHealth *= 0.98; // Reduces health to 98% of previous value
-        }
-  
+      case INCREMENT_AGE:
         return {
           ...state,
-          time: newTime,
-          age: newAge,
-          health: Math.min(100, Math.max(0, newHealth)),
-          bankBalance: newBankBalance
+          age: state.age + 1
         };
     default:
       return state;
@@ -93,18 +80,12 @@ export const StatProvider = ({ children }) => {
     dispatch({ type: UPDATE_BANK_BALANCE, payload: amount });
   };
 
-  const setSubjectProgress = (subject, progress) => {
-    dispatch({ type: SET_SUBJECT_PROGRESS, payload: { subject, progress } });
-  };
-
-  const resetSubjectProgress = (subject) => {
-    dispatch({ type: RESET_SUBJECT_PROGRESS, payload: { subject } });
-  };
-
   const incrementTime = (minutes) => {
     dispatch({ type: INCREMENT_TIME, payload: minutes });
   };
-
+  const incrementAge = () => {
+    dispatch({ type: INCREMENT_AGE });
+  };
   // Simulate a game timer
   useEffect(() => {
     const interval = setInterval(() => {
@@ -118,9 +99,8 @@ export const StatProvider = ({ children }) => {
       stats: state,
       modifyStats,
       modifyBankBalance,
-      setSubjectProgress,
-      resetSubjectProgress,
-      incrementTime
+      incrementTime,
+      incrementAge
     }}>
       {children}
     </StatContext.Provider>
