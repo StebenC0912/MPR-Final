@@ -10,10 +10,18 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"; // Import Firestore
+import { set } from "firebase/database";
 
 const CreateCharacter = ({ navigation, route }) => {
   const { uid } = route.params;
   const [name, setName] = useState("");
+  const gender = [
+    { label: "Male", value: 1 },
+    { label: "Female", value: 2 },
+  ];
+  const [pickedGender, setPickedGender] = useState("");
+  const [isFocus, setIsFocus] = useState(false);
+  let found = false;
   useEffect(() => {
     const fetchCharacter = async () => {
       try {
@@ -23,7 +31,13 @@ const CreateCharacter = ({ navigation, route }) => {
           const characterData = doc.data();
           // Check if the UID in the document matches the current user's UID
           if (characterData.uid === uid) {
-            console.log("Character found:");
+            setIsFocus(true);
+            found = true;
+            if (characterData.gender === "Male") {
+              setPickedGender(gender[0]);
+            } else {
+              setPickedGender(gender[1]);
+            }
             setName(characterData.name);
             // You can set state or perform any other action with the character data here
           }
@@ -36,12 +50,6 @@ const CreateCharacter = ({ navigation, route }) => {
     fetchCharacter();
   }, [uid]);
 
-  const gender = [
-    { label: "Male", value: 1 },
-    { label: "Female", value: 2 },
-  ];
-  const [pickedGender, setPickedGender] = useState("");
-  const [isFocus, setIsFocus] = useState(false);
   const db = getFirestore(); // Initialize Firestore
 
   const handleStartButton = async () => {
@@ -53,19 +61,22 @@ const CreateCharacter = ({ navigation, route }) => {
       Alert.alert("Please choose a gender");
       return;
     }
-
-    try {
-      // Add a document to the "characters" collection
-      const docRef = await addDoc(collection(db, "characters"), {
-        name: name,
-        gender: pickedGender.label,
-        uid: uid,
-      });
-      console.log("Document written with ID: ", docRef.id);
-      navigation.navigate("Main", { name: name }); // Navigate after saving
-    } catch (error) {
-      console.error("Error writing document: ", error);
-      Alert.alert("Error", "Unable to create character.");
+    if (!found) {
+      try {
+        // Add a document to the "characters" collection
+        const docRef = await addDoc(collection(db, "characters"), {
+          name: name,
+          gender: pickedGender.label,
+          uid: uid,
+        });
+        console.log("Document written with ID: ", docRef.id);
+        navigation.navigate("Main", { name: name }); // Navigate after saving
+      } catch (error) {
+        console.error("Error writing document: ", error);
+        Alert.alert("Error", "Unable to create character.");
+      }
+    } else {
+      navigation.navigate("Main", { name: name });
     }
   };
 
@@ -79,6 +90,7 @@ const CreateCharacter = ({ navigation, route }) => {
           />
           <Text style={styles.text1}>New Life</Text>
         </View>
+
         <Text style={styles.text2}>Start a new life</Text>
 
         <View style={styles.maleButton}>
@@ -91,7 +103,7 @@ const CreateCharacter = ({ navigation, route }) => {
                   fontSize: 16,
                 }}
               >
-                Start {name}'s Life
+                {isFocus ? "Continue" : "Start"} {name}'s Life
               </Text>
             </View>
           </TouchableOpacity>
