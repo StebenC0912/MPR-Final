@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -9,10 +9,33 @@ import {
   TextInput,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { getFirestore, collection, addDoc } from "firebase/firestore"; // Import Firestore
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"; // Import Firestore
 
-const CreateCharacter = ({ navigation }) => {
+const CreateCharacter = ({ navigation, route }) => {
+  const { uid } = route.params;
   const [name, setName] = useState("");
+  useEffect(() => {
+    const fetchCharacter = async () => {
+      try {
+        // Fetch character data from Firestore based on UID
+        const querySnapshot = await getDocs(collection(db, "characters"));
+        querySnapshot.forEach((doc) => {
+          const characterData = doc.data();
+          // Check if the UID in the document matches the current user's UID
+          if (characterData.uid === uid) {
+            console.log("Character found:");
+            setName(characterData.name);
+            // You can set state or perform any other action with the character data here
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching character:", error.message);
+      }
+    };
+
+    fetchCharacter();
+  }, [uid]);
+
   const gender = [
     { label: "Male", value: 1 },
     { label: "Female", value: 2 },
@@ -35,16 +58,16 @@ const CreateCharacter = ({ navigation }) => {
       // Add a document to the "characters" collection
       const docRef = await addDoc(collection(db, "characters"), {
         name: name,
-        gender: pickedGender,
+        gender: pickedGender.label,
+        uid: uid,
       });
       console.log("Document written with ID: ", docRef.id);
-      navigation.navigate('Main', { name: name }); // Navigate after saving
+      navigation.navigate("Main", { name: name }); // Navigate after saving
     } catch (error) {
       console.error("Error writing document: ", error);
       Alert.alert("Error", "Unable to create character.");
     }
   };
-
 
   return (
     <View style={styles.container}>

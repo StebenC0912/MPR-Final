@@ -1,12 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons'; // Make sure to install this or use similar icons available to you
-import { useStats } from '../store/StatContext';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons"; // Make sure to install this or use similar icons available to you
+import { useStats } from "../store/StatContext";
 import { starterPack } from "../data/test";
 
 const ProgressBar = ({ progress, color }) => (
   <View style={styles.progressBarContainer}>
-    <View style={[styles.progressBar, { width: `${progress}%`, backgroundColor: color }]} />
+    <View
+      style={[
+        styles.progressBar,
+        { width: `${progress}%`, backgroundColor: color },
+      ]}
+    />
   </View>
 );
 
@@ -38,12 +50,19 @@ const MainScreen = ({ navigation, route }) => {
       </View>
       <View style={styles.profileSection}>
         <Image
-          source={{ uri: 'https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg' }}
+          source={{
+            uri: "https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg",
+          }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>{name}</Text>
-        <Text style={styles.age}>Age: {stats.age}</Text> 
-        <Text style={styles.bankBalance}>Bank Balance: ${stats.bankBalance}</Text>
+        <View>
+          <Text style={styles.profileName}>{name}</Text>
+          <Text style={styles.age}>Age: {stats.age}</Text>
+        </View>
+
+        <Text style={styles.bankBalance}>
+          Bank Balance: ${stats.bankBalance}
+        </Text>
       </View>
       <View style={styles.detailsSection}>
         <FlatList

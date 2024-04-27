@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Button, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Button,
+  StyleSheet,
+} from "react-native";
 import { initializeApp } from "@firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "@firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "@firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "@firebase/firestore";
 
 const firebaseConfig = {
@@ -37,7 +51,11 @@ export default function AuthenticationScreen({ navigation }) {
 
   const handleSignUp = async (email, password) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
       // Set user data in Firestore
       await setDoc(doc(db, "users", user.uid), {
@@ -55,7 +73,7 @@ export default function AuthenticationScreen({ navigation }) {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User signed in successfully!");
-      navigation.navigate("CreateCharacter");
+      navigation.navigate("CreateCharacter", {uid: auth.currentUser.uid});
     } catch (error) {
       console.error("Error logging in:", error.message);
     }
@@ -88,12 +106,30 @@ export default function AuthenticationScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.authContainer}>
         <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" autoCapitalize="none" />
-        <TextInput style={styles.input} value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry />
-        <Button title={isLogin ? "Sign In" : "Sign Up"} onPress={handleAuthentication} color="#3498db" />
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Password"
+          secureTextEntry
+        />
+        <Button
+          title={isLogin ? "Sign In" : "Sign Up"}
+          onPress={handleAuthentication}
+          color="#3498db"
+        />
         <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
           <Text style={styles.toggleText}>
-            {isLogin ? "Need an account? Sign Up" : "Already have an account? Sign In"}
+            {isLogin
+              ? "Need an account? Sign Up"
+              : "Already have an account? Sign In"}
           </Text>
         </TouchableOpacity>
       </View>
