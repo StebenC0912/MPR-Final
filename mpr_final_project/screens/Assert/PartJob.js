@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useStats } from '../../store/StatContext'; // Going up two levels
- // Going up one level
- // Ensure this is correctly imported
+import { useStats } from '../../store/StatContext'; // Ensure the import path is correct
 
 const PartJob = ({ navigation }) => {
     const { modifyBankBalance } = useStats();
@@ -14,12 +12,14 @@ const PartJob = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Select a Part-Time Job</Text>
+            <View style={styles.header}>
+                <Text style={styles.headerText}>Select a Part-Time Job</Text>
+            </View>
             <TouchableOpacity style={styles.jobButton} onPress={() => handleSelectJob(100)}>
-                <Text>Cleaning Houses - Earn $100</Text>
+                <Text style={styles.jobText}>Cleaning Houses - Earn $100</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.jobButton} onPress={() => handleSelectJob(200)}>
-                <Text>Babysitting - Earn $200</Text>
+                <Text style={styles.jobText}>Babysitting - Earn $200</Text>
             </TouchableOpacity>
         </View>
     );
@@ -28,19 +28,31 @@ const PartJob = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#fff'
+        backgroundColor: '#ecf0f1',
     },
     header: {
-        fontSize: 22,
+        backgroundColor: '#34495e',
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    headerText: {
+        color: '#ffffff',
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20
     },
     jobButton: {
-        backgroundColor: '#ededed',
-        padding: 15,
-        marginBottom: 10,
-        alignItems: 'center'
+        backgroundColor: '#34495e', // Same button color as other screens
+        padding: 10,
+        borderRadius: 5,
+        marginVertical: 5,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ffffff' // White border for visual consistency
+    },
+    jobText: {
+        color: '#ffffff', // White text color for readability
+        fontSize: 16,
     }
 });
 

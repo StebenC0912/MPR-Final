@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-
 const Assert = ({ navigation }) => {
   return (
     <View style={styles.container}>
@@ -10,7 +9,7 @@ const Assert = ({ navigation }) => {
       </View>
       <View style={styles.content}>
         <TouchableOpacity onPress={() => navigation.navigate('Loan')}>
-          <Text style={styles.label}>Loan</Text>
+          <Text style={styles.label}>Job</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('PartJob')}>
           <Text style={styles.label}>Part-time Job</Text>
@@ -43,20 +42,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#34495e',
     paddingVertical: 10,
-    backgroundColor: '#ccc', // Light grey background for buttons
+    backgroundColor: '#ccc',
     padding: 10,
-    marginVertical: 5, // Margin for spacing between buttons
-  },
-  progressBarBackground: {
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#dfe4ea',
-    overflow: 'hidden',
-    marginVertical: 5, // Add some vertical space around the progress bar
-  },
-  progressBarForeground: {
-    height: '100%',
-    borderRadius: 10,
+    marginVertical: 5,
   },
 });
 

@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#34495e',
     paddingVertical: 10,
-    backgroundColor: '#ccc', // Adding background color for better touch feedback
-    marginTop: 10, // Margin for better spacing
-    padding: 10, // Padding for better touch area
+    backgroundColor: '#ccc',
+    marginTop: 10,
+    padding: 10,
   },
   progressBarBackground: {
     height: 20,

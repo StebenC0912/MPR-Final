@@ -1,22 +1,25 @@
-import React, { createContext, useReducer, useContext } from 'react';
+import React, { createContext, useReducer, useContext, useEffect } from 'react';
 
 // Define the context
 const StatContext = createContext();
 
-// Initial state for the stats
+// Initial state for the stats and time
 const initialState = {
   happy: 100,
   health: 100,
   smart: 30,
   look: 20,
-  bankBalance: 0 // Assuming you want to manage bank balance as well
+  bankBalance: 0, // Manage bank balance
+  age: 0, // Added age to manage character age
+  time: 0 // Added time to manage game time in hours
 };
 
-// Actions types
+// Action types for context updates
 const MODIFY_STATS = 'MODIFY_STATS';
 const UPDATE_BANK_BALANCE = 'UPDATE_BANK_BALANCE';
 const SET_SUBJECT_PROGRESS = 'SET_SUBJECT_PROGRESS';
 const RESET_SUBJECT_PROGRESS = 'RESET_SUBJECT_PROGRESS';
+const INCREMENT_TIME = 'INCREMENT_TIME'; // New action for incrementing time
 
 // Reducer to handle actions
 function statReducer(state, action) {
@@ -24,18 +27,17 @@ function statReducer(state, action) {
     case MODIFY_STATS:
       return {
         ...state,
-        happy: Math.max(0, state.happy + action.payload.happy),
-        health: Math.max(0, state.health + action.payload.health),
-        smart: Math.max(0, state.smart + action.payload.smart),
-        look: Math.max(0, state.look + action.payload.look),
+        happy: Math.min(100, Math.max(0, state.happy + action.payload.happy)),
+        health: Math.min(100, Math.max(0, state.health + action.payload.health)),
+        smart: Math.min(100, Math.max(0, state.smart + action.payload.smart)),
+        look: Math.min(100, Math.max(0, state.look + action.payload.look)),
       };
     case UPDATE_BANK_BALANCE:
       return {
         ...state,
-        bankBalance: state.bankBalance + action.payload.amount
+        bankBalance: state.bankBalance + action.payload
       };
     case SET_SUBJECT_PROGRESS:
-      // Assuming a structure for handling multiple subjects with progress
       return {
         ...state,
         subjectProgress: {
@@ -51,47 +53,79 @@ function statReducer(state, action) {
           [action.payload.subject]: 0
         }
       };
+      case INCREMENT_TIME:
+        const newTime = state.time + action.payload;
+        const newAge = state.age + Math.floor(newTime / 12) - Math.floor(state.time / 12);
+        let newHealth = state.health;
+        let newBankBalance = state.bankBalance;
+  
+        // Increment bank balance when reaching 18 years old
+        if (newAge === 18) {
+          newBankBalance += 10000; // adjust as necessary
+        }
+  
+        // Decrement health by 2% for each year over 35
+        if (newAge > 35) {
+          newHealth *= 0.98; // Reduces health to 98% of previous value
+        }
+  
+        return {
+          ...state,
+          time: newTime,
+          age: newAge,
+          health: Math.min(100, Math.max(0, newHealth)),
+          bankBalance: newBankBalance
+        };
     default:
       return state;
   }
 }
 
-// Create a provider to wrap your application's component tree
+// Provider to encapsulate global state
 export const StatProvider = ({ children }) => {
   const [state, dispatch] = useReducer(statReducer, initialState);
 
-  // Function to modify stats
   const modifyStats = (changes) => {
     dispatch({ type: MODIFY_STATS, payload: changes });
   };
 
-  // Function to update bank balance
   const modifyBankBalance = (amount) => {
-    dispatch({ type: UPDATE_BANK_BALANCE, payload: { amount } });
+    dispatch({ type: UPDATE_BANK_BALANCE, payload: amount });
   };
 
-  // Function to set subject progress
   const setSubjectProgress = (subject, progress) => {
     dispatch({ type: SET_SUBJECT_PROGRESS, payload: { subject, progress } });
   };
 
-  // Function to reset subject progress
   const resetSubjectProgress = (subject) => {
     dispatch({ type: RESET_SUBJECT_PROGRESS, payload: { subject } });
   };
 
+  const incrementTime = (minutes) => {
+    dispatch({ type: INCREMENT_TIME, payload: minutes });
+  };
+
+  // Simulate a game timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      incrementTime(0.083); // Increment time by 5 minutes each interval
+    }, 5000); // Interval set to real time 5 seconds for simulation
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <StatContext.Provider value={{ 
-      stats: state, 
-      modifyStats, 
-      modifyBankBalance, 
-      setSubjectProgress, 
-      resetSubjectProgress 
+    <StatContext.Provider value={{
+      stats: state,
+      modifyStats,
+      modifyBankBalance,
+      setSubjectProgress,
+      resetSubjectProgress,
+      incrementTime
     }}>
       {children}
     </StatContext.Provider>
   );
 };
 
-// Custom hook to use the stat context
+// Custom hook for easy context usage
 export const useStats = () => useContext(StatContext);

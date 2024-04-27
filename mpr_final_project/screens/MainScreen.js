@@ -1,83 +1,36 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Make sure to install these or use similar icons available to you
-import { useStats } from "../store/StatContext";
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons'; // Make sure to install this or use similar icons available to you
+import { useStats } from '../store/StatContext';
 import { starterPack } from "../data/test";
 
-const ProgressBar = ({ progress, color }) => {
-  return (
-    <View style={styles.progressBarContainer}>
-      <View
-        style={[
-          styles.progressBar,
-          { width: `${progress}%`, backgroundColor: color },
-        ]}
-      />
-    </View>
-  );
-};
+const ProgressBar = ({ progress, color }) => (
+  <View style={styles.progressBarContainer}>
+    <View style={[styles.progressBar, { width: `${progress}%`, backgroundColor: color }]} />
+  </View>
+);
 
 const MainScreen = ({ navigation, route }) => {
   let dataEvent = [];
   starterPack.forEach((event) => {
     const age = event.age;
-    // Find the index of age in dataEvent
     const index = dataEvent.findIndex((element) => element.id === age);
     if (index === -1) {
-      // If age does not exist, create a new entry
       dataEvent.push({ id: age, events: [event] });
     } else {
-      // If age exists, push the event to existing entry
       dataEvent[index].events.push(event);
     }
   });
-  const { stats, modifyStats, modifyBankBalance } = useStats();
-  const [age, setAge] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const { name } = route.params;
 
+  const { stats, modifyBankBalance, incrementTime } = useStats();
+  const { name } = route.params;
+  const handleIncreaseAge = () => {
+    incrementTime(12); // Add 12 minutes to time, which translates to one year
+  };
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress >= 100) {
-          incrementAge();
-          return 0;
-        }
-        return prevProgress + 100 / (12 * 60);
-      });
-    }, 1000);
-    return () => clearInterval(interval);
+    // This will now be managed within the StatContext, no need to duplicate here
   }, []);
 
-  // Use a callback to increment age to encapsulate the condition checking
-  const incrementAge = useCallback(() => {
-    setAge((prevAge) => {
-      const newAge = prevAge + 1;
-      if (newAge === 18) {
-        modifyBankBalance(10000); // Add $10,000 when age reaches 18
-      }
-      // Move the side effects to an effect hook
-      if (newAge > 35) {
-        // Delay this update to the next effect cycle
-        requestAnimationFrame(() => {
-          modifyStats({ health: -2, happy: +0, smart: +0, look: +0 });
-        });
-      }
-      return newAge;
-    });
-  }, [modifyStats]);
-
-  const handleIncreaseAge = () => {
-    incrementAge();
-  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -85,45 +38,31 @@ const MainScreen = ({ navigation, route }) => {
       </View>
       <View style={styles.profileSection}>
         <Image
-          source={{
-            uri: "https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg",
-          }}
+          source={{ uri: 'https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg' }}
           style={styles.profileImage}
         />
-        <View>
-          <Text style={styles.profileName}>{name}</Text>
-          <Text style={styles.Age}>Age: {age}</Text>
-        </View>
-
-        <Text style={styles.bankBalance}>
-          Bank Balance: ${stats.bankBalance}
-        </Text>
+        <Text style={styles.profileName}>{name}</Text>
+        <Text style={styles.age}>Age: {stats.age}</Text> 
+        <Text style={styles.bankBalance}>Bank Balance: ${stats.bankBalance}</Text>
       </View>
       <View style={styles.detailsSection}>
         <FlatList
           data={dataEvent}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View
-              style={{
-                marginBottom: 10,
-              }}
-            >
+            <View style={{ marginBottom: 10 }}>
               <Text>{item.id} years old:</Text>
               <FlatList
                 data={item.events}
-                keyExtractor={(event) => event.id}
-                renderItem={({ item: event }) => (
-                  <Text key={event.id}>- {event.title}</Text>
-                )}
+                keyExtractor={(event) => event.id.toString()}
+                renderItem={({ item: event }) => <Text>- {event.title}</Text>}
               />
             </View>
           )}
         />
       </View>
-
       <View style={styles.timeBarContainer}>
-        <ProgressBar progress={progress} color="#3498db" />
+        <ProgressBar progress={(stats.time % 12) * 8.33} color="#3498db" />
       </View>
       <View style={styles.statsSection}>
         <View style={styles.stat}>
@@ -156,7 +95,7 @@ const MainScreen = ({ navigation, route }) => {
           onPress={() => navigation.navigate("Assert")}
         >
           <FontAwesome5 name="dollar-sign" size={24} color="white" />
-          <Text style={styles.navText}>Bank</Text>
+          <Text style={styles.navText}>Assert</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={handleIncreaseAge}>
           <FontAwesome5 name="plus" size={24} color="white" />
@@ -174,7 +113,7 @@ const MainScreen = ({ navigation, route }) => {
           onPress={() => navigation.navigate("Activity")}
         >
           <FontAwesome5 name="briefcase" size={24} color="white" />
-          <Text style={styles.navText}>Jobs</Text>
+          <Text style={styles.navText}>Ac</Text>
         </TouchableOpacity>
       </View>
     </View>
