@@ -16,7 +16,6 @@ import {
   onAuthStateChanged,
   signOut,
 } from "@firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "@firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCq4IhbwrqWvt_5qfRhT3sO3THoVCJt4aw",
@@ -27,10 +26,53 @@ const firebaseConfig = {
   appId: "1:235934729461:web:76ce89c232c818dfec71bc",
   measurementId: "G-7HCWM7CXLS",
 };
-
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+
+const AuthScreen = ({
+  email,
+  setEmail,
+  password,
+  setPassword,
+  isLogin,
+  setIsLogin,
+  handleAuthentication,
+}) => {
+  return (
+    <View style={styles.authContainer}>
+      <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
+
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Email"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        placeholder="Password"
+        secureTextEntry
+      />
+      <View style={styles.buttonContainer}>
+        <Button
+          title={isLogin ? "Sign In" : "Sign Up"}
+          onPress={handleAuthentication}
+          color="#3498db"
+        />
+      </View>
+
+      <View style={styles.bottomContainer}>
+        <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
+          {isLogin
+            ? "Need an account? Sign Up"
+            : "Already have an account? Sign In"}
+        </Text>
+      </View>
+    </View>
+  );
+};
 
 export default function AuthenticationScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -38,105 +80,55 @@ export default function AuthenticationScreen({ navigation }) {
   const [user, setUser] = useState(null); // Track user authentication state
   const [isLogin, setIsLogin] = useState(true);
 
+  const auth = getAuth(app);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchUserData(user.uid); // Fetch user data on auth state changed
-      }
       setUser(user);
     });
 
     return () => unsubscribe();
   }, [auth]);
 
-  const handleSignUp = async (email, password) => {
+  const handleAuthentication = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-      // Set user data in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        email: email,
-        // Add any additional fields
-      });
-      console.log("User created and data saved!");
-      navigation.navigate("CreateCharacter");
-    } catch (error) {
-      console.error("Error signing up:", error.message);
-    }
-  };
-
-  const handleLogin = async (email, password) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed in successfully!");
-      navigation.navigate("CreateCharacter", {uid: auth.currentUser.uid});
-    } catch (error) {
-      console.error("Error logging in:", error.message);
-    }
-  };
-
-  const fetchUserData = async (userId) => {
-    try {
-      const userDoc = await getDoc(doc(db, "users", userId));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        console.log("User data:", userData);
-        // Set user data to state/context here if needed
+      if (user) {
+        // If user is already authenticated, log out
+        navigation.navigate("CreateCharacter", { uid: user.uid });
       } else {
-        console.log("No user data found!");
+        // Sign in or sign up
+        if (isLogin) {
+          // Sign in
+          await signInWithEmailAndPassword(auth, email, password);
+          console.log("User signed in successfully!");
+          navigation.navigate("CreateCharacter", { uid: user.uid });
+        } else {
+          // Sign up
+          await createUserWithEmailAndPassword(auth, email, password);
+          console.log("User created successfully!");
+          setIsLogin(true); // Switch to login mode
+          setEmail(""); // Clear email field
+          setPassword(""); // Clear password field
+        }
       }
     } catch (error) {
-      console.error("Error fetching user data:", error.message);
-    }
-  };
-
-  const handleAuthentication = () => {
-    if (isLogin) {
-      handleLogin(email, password);
-    } else {
-      handleSignUp(email, password);
+      console.error("Authentication error:", error.message);
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.authContainer}>
-        <Text style={styles.title}>{isLogin ? "Sign In" : "Sign Up"}</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Email"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Password"
-          secureTextEntry
-        />
-        <Button
-          title={isLogin ? "Sign In" : "Sign Up"}
-          onPress={handleAuthentication}
-          color="#3498db"
-        />
-        <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-          <Text style={styles.toggleText}>
-            {isLogin
-              ? "Need an account? Sign Up"
-              : "Already have an account? Sign In"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <AuthScreen
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        isLogin={isLogin}
+        setIsLogin={setIsLogin}
+        handleAuthentication={handleAuthentication}
+      />
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -166,12 +158,19 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 4,
   },
+  buttonContainer: {
+    marginBottom: 16,
+  },
   toggleText: {
     color: "#3498db",
     textAlign: "center",
-    marginTop: 20,
   },
   bottomContainer: {
     marginTop: 20,
+  },
+  emailText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 20,
   },
 });
