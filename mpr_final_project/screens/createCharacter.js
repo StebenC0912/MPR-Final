@@ -9,7 +9,9 @@ import {
   TextInput,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-const CreateCharacter = ({ navigation, route }) => {
+import { getFirestore, collection, addDoc } from "firebase/firestore"; // Import Firestore
+
+const CreateCharacter = ({ navigation }) => {
   const [name, setName] = useState("");
   const gender = [
     { label: "Male", value: 1 },
@@ -17,15 +19,33 @@ const CreateCharacter = ({ navigation, route }) => {
   ];
   const [pickedGender, setPickedGender] = useState("");
   const [isFocus, setIsFocus] = useState(false);
-  const handleStartButton = () => {
+  const db = getFirestore(); // Initialize Firestore
+
+  const handleStartButton = async () => {
     if (name === "") {
       Alert.alert("Please enter a name");
-    } else if (pickedGender === "") {
+      return;
+    }
+    if (pickedGender === "") {
       Alert.alert("Please choose a gender");
-    } else {
-      navigation.navigate("Main", { name: name });
+      return;
+    }
+
+    try {
+      // Add a document to the "characters" collection
+      const docRef = await addDoc(collection(db, "characters"), {
+        name: name,
+        gender: pickedGender,
+      });
+      console.log("Document written with ID: ", docRef.id);
+      navigation.navigate('Main', { name: name }); // Navigate after saving
+    } catch (error) {
+      console.error("Error writing document: ", error);
+      Alert.alert("Error", "Unable to create character.");
     }
   };
+
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
