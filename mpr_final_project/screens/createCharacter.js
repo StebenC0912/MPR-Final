@@ -20,12 +20,12 @@ const CreateCharacter = ({ navigation, route }) => {
   const handleStartButton = () => {
     if (name === "") {
       Alert.alert("Please enter a name");
+    } else if (pickedGender === "") {
+      Alert.alert("Please choose a gender");
+    } else {
+      navigation.navigate("Main", { name: name });
     }
-    if (pickedGender === "") {
-      Alert.alert("Please choose a gender")
-    }
-    navigation.navigate('Main', { name:name });
-  }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -39,9 +39,7 @@ const CreateCharacter = ({ navigation, route }) => {
         <Text style={styles.text2}>Start a new life</Text>
 
         <View style={styles.maleButton}>
-          <TouchableOpacity
-          onPress={handleStartButton}
-          >
+          <TouchableOpacity onPress={handleStartButton}>
             <View style={styles.button1}>
               <Text
                 style={{
@@ -66,12 +64,12 @@ const CreateCharacter = ({ navigation, route }) => {
 
         <View style={styles.maleButton}>
           <Dropdown
-          selectedTextStyle={{
-            color: "#6B7682",
-            fontFamily: "OrelegaOne",
-            fontSize: 16,
-            textAlign: "center",
-          }}
+            selectedTextStyle={{
+              color: "#6B7682",
+              fontFamily: "OrelegaOne",
+              fontSize: 16,
+              textAlign: "center",
+            }}
             style={{
               width: 320,
               height: 70,
@@ -85,7 +83,6 @@ const CreateCharacter = ({ navigation, route }) => {
               alignSelf: "center",
               fontFamily: "OrelegaOne",
               paddingLeft: 10,
-              
             }}
             data={gender}
             labelField={"label"}
@@ -96,7 +93,7 @@ const CreateCharacter = ({ navigation, route }) => {
             placeholderStyle={StyleSheet.create({
               fontSize: 16,
               color: "#6B7682",
-                fontFamily: "OrelegaOne",
+              fontFamily: "OrelegaOne",
               textAlign: "center",
             })}
           />
@@ -182,7 +179,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     top: 150,
     marginBottom: 20,
-    
   },
   femaleButton: {
     display: "flex",
