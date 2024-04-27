@@ -15,6 +15,7 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  firebase,
 } from "@firebase/auth";
 
 const firebaseConfig = {
@@ -93,14 +94,14 @@ export default function AuthenticationScreen({ navigation }) {
     try {
       if (user) {
         // If user is already authenticated, log out
-        navigation.navigate("CreateCharacter", { uid: user.uid });
+        navigation.navigate("CreateCharacter", { uid: auth.currentUser.uid });
       } else {
         // Sign in or sign up
         if (isLogin) {
           // Sign in
           await signInWithEmailAndPassword(auth, email, password);
           console.log("User signed in successfully!");
-          navigation.navigate("CreateCharacter", { uid: user.uid });
+          navigation.navigate("CreateCharacter", { uid: auth.currentUser.uid });
         } else {
           // Sign up
           await createUserWithEmailAndPassword(auth, email, password);

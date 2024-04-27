@@ -9,8 +9,7 @@ import {
   TextInput,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"; // Import Firestore
-import { set } from "firebase/database";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc } from "firebase/firestore"; // Import Firestore
 
 const CreateCharacter = ({ navigation, route }) => {
   const { uid } = route.params;
@@ -21,7 +20,8 @@ const CreateCharacter = ({ navigation, route }) => {
   ];
   const [pickedGender, setPickedGender] = useState("");
   const [isFocus, setIsFocus] = useState(false);
-  let found = false;
+  const [character, setCharacter] = useState(null); // Initialize state to store characters
+  const [found, setFound] = useState(false);
   useEffect(() => {
     const fetchCharacter = async () => {
       try {
@@ -32,13 +32,14 @@ const CreateCharacter = ({ navigation, route }) => {
           // Check if the UID in the document matches the current user's UID
           if (characterData.uid === uid) {
             setIsFocus(true);
-            found = true;
+            setFound(true);
             if (characterData.gender === "Male") {
               setPickedGender(gender[0]);
             } else {
               setPickedGender(gender[1]);
             }
             setName(characterData.name);
+            setCharacter(characterData);
             // You can set state or perform any other action with the character data here
           }
         });
@@ -50,6 +51,7 @@ const CreateCharacter = ({ navigation, route }) => {
     fetchCharacter();
   }, [uid]);
 
+  console.log("Character:", character);
   const db = getFirestore(); // Initialize Firestore
 
   const handleStartButton = async () => {
@@ -61,8 +63,21 @@ const CreateCharacter = ({ navigation, route }) => {
       Alert.alert("Please choose a gender");
       return;
     }
-    if (!found) {
+    if (
+      !found ||
+      name === character.name ||
+      pickedGender.label === character.gender
+    ) {
       try {
+        // delete the existing character
+        const querySnapshot = await getDocs(collection(db, "characters"));
+        querySnapshot.forEach((doc) => {
+          const characterData = doc.data();
+          // Check if the UID in the document matches the current user's UID
+          if (characterData.uid === uid) {
+            deleteDoc(doc.ref);
+          }
+        });
         // Add a document to the "characters" collection
         const docRef = await addDoc(collection(db, "characters"), {
           name: name,
@@ -111,7 +126,10 @@ const CreateCharacter = ({ navigation, route }) => {
         <View style={styles.maleButton}>
           <TextInput
             placeholder="Name"
-            onChangeText={setName}
+            onChangeText={(text) => {
+              setName(text);
+              setFound(false);
+            }}
             value={name}
             style={styles.textinput}
           />
