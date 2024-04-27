@@ -1,20 +1,32 @@
-import React, { useState, useEffect, useCallback} from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, FlatList } from 'react-native';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Make sure to install these or use similar icons available to you
-import { useStats } from '../store/StatContext';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Make sure to install these or use similar icons available to you
+import { useStats } from "../store/StatContext";
 import { starterPack } from "../data/test";
 
-
 const ProgressBar = ({ progress, color }) => {
-    return (
-      <View style={styles.progressBarContainer}>
-        <View style={[styles.progressBar, { width: `${progress}%`, backgroundColor: color }]} />
-      </View>
-    );
-  };
-  
-  const MainScreen = ({ navigation, route }) => {
-    let dataEvent = [];
+  return (
+    <View style={styles.progressBarContainer}>
+      <View
+        style={[
+          styles.progressBar,
+          { width: `${progress}%`, backgroundColor: color },
+        ]}
+      />
+    </View>
+  );
+};
+
+const MainScreen = ({ navigation, route }) => {
+  let dataEvent = [];
   starterPack.forEach((event) => {
     const age = event.age;
     // Find the index of age in dataEvent
@@ -27,69 +39,75 @@ const ProgressBar = ({ progress, color }) => {
       dataEvent[index].events.push(event);
     }
   });
-    const { stats, modifyStats, modifyBankBalance } = useStats();
-    const [age, setAge] = useState(0);
-    const [progress, setProgress] = useState(0);
-    const { name } = route.params;
+  const { stats, modifyStats, modifyBankBalance } = useStats();
+  const [age, setAge] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const { name } = route.params;
 
-    useEffect(() => {
-      const interval = setInterval(() => {
-          setProgress(prevProgress => {
-              if (prevProgress >= 100) {
-                  incrementAge();
-                  return 0;
-              }
-              return prevProgress + 100 / (12 * 60);
-          });
-      }, 1000);
-      return () => clearInterval(interval);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          incrementAge();
+          return 0;
+        }
+        return prevProgress + 100 / (12 * 60);
+      });
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // Use a callback to increment age to encapsulate the condition checking
   const incrementAge = useCallback(() => {
-      setAge(prevAge => {
-        
-          const newAge = prevAge + 1;
-          if (newAge === 18) {
-            modifyBankBalance(10000);  // Add $10,000 when age reaches 18
-        }
-          // Move the side effects to an effect hook
-          if (newAge > 35) {
-              // Delay this update to the next effect cycle
-              requestAnimationFrame(() => {
-                  modifyStats({ health: -2, happy: +0, smart: +0, look: +0 });
-              });
-          }
-          return newAge;
-      });
+    setAge((prevAge) => {
+      const newAge = prevAge + 1;
+      if (newAge === 18) {
+        modifyBankBalance(10000); // Add $10,000 when age reaches 18
+      }
+      // Move the side effects to an effect hook
+      if (newAge > 35) {
+        // Delay this update to the next effect cycle
+        requestAnimationFrame(() => {
+          modifyStats({ health: -2, happy: +0, smart: +0, look: +0 });
+        });
+      }
+      return newAge;
+    });
   }, [modifyStats]);
 
   const handleIncreaseAge = () => {
-      incrementAge();
+    incrementAge();
   };
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>New Life</Text>
-            </View>
-            <View style={styles.profileSection}>
-                <Image
-                    source={{ uri: 'https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg' }}
-                    style={styles.profileImage}
-                />
-                <Text style={styles.profileName}>{name}</Text>
-                <Text style={styles.Age}>Age: {age}</Text> 
-                <Text style={styles.bankBalance}>Bank Balance: ${stats. bankBalance}</Text>
-            </View>
-            <View style={styles.detailsSection}>
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>New Life</Text>
+      </View>
+      <View style={styles.profileSection}>
+        <Image
+          source={{
+            uri: "https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg",
+          }}
+          style={styles.profileImage}
+        />
+        <View>
+          <Text style={styles.profileName}>{name}</Text>
+          <Text style={styles.Age}>Age: {age}</Text>
+        </View>
+
+        <Text style={styles.bankBalance}>
+          Bank Balance: ${stats.bankBalance}
+        </Text>
+      </View>
+      <View style={styles.detailsSection}>
         <FlatList
           data={dataEvent}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View
-            style={{
-              marginBottom: 10,
-            }}
+              style={{
+                marginBottom: 10,
+              }}
             >
               <Text>{item.id} years old:</Text>
               <FlatList
@@ -102,15 +120,12 @@ const ProgressBar = ({ progress, color }) => {
             </View>
           )}
         />
-
-    
       </View>
 
       <View style={styles.timeBarContainer}>
         <ProgressBar progress={progress} color="#3498db" />
       </View>
       <View style={styles.statsSection}>
-
         <View style={styles.stat}>
           <Text style={styles.statLabel}>Happy</Text>
           <ProgressBar progress={stats.happy} color="#ffeb3b" />
@@ -128,30 +143,42 @@ const ProgressBar = ({ progress, color }) => {
           <ProgressBar progress={stats.look} color="#e91e63" />
         </View>
       </View>
-            <View style={styles.navBar}>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('School')}>
-                    <FontAwesome5 name="school" size={24} color="white" />
-                    <Text style={styles.navText}>School</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Assert')}>
-                    <FontAwesome5 name="dollar-sign" size={24} color="white" />
-                    <Text style={styles.navText}>Bank</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={handleIncreaseAge}>
-                    <FontAwesome5 name="plus" size={24} color="white" />
-                    <Text style={styles.navText}>Age</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Relationship')}>
-                    <FontAwesome5 name="user-friends" size={24} color="white" />
-                    <Text style={styles.navText}>Relationship</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Activity')}>
-                    <FontAwesome5 name="briefcase" size={24} color="white" />
-                    <Text style={styles.navText}>Jobs</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+      <View style={styles.navBar}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("School")}
+        >
+          <FontAwesome5 name="school" size={24} color="white" />
+          <Text style={styles.navText}>School</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Assert")}
+        >
+          <FontAwesome5 name="dollar-sign" size={24} color="white" />
+          <Text style={styles.navText}>Bank</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={handleIncreaseAge}>
+          <FontAwesome5 name="plus" size={24} color="white" />
+          <Text style={styles.navText}>Age</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Relationship")}
+        >
+          <FontAwesome5 name="user-friends" size={24} color="white" />
+          <Text style={styles.navText}>Relationship</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Activity")}
+        >
+          <FontAwesome5 name="briefcase" size={24} color="white" />
+          <Text style={styles.navText}>Jobs</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 };
 const styles = StyleSheet.create({
   container: {
@@ -244,7 +271,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    marginTop: 210,
     paddingVertical: 10,
     backgroundColor: "#3498db", // Adjust to the color in the image
   },
