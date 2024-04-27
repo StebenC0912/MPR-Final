@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Make sure to install these or use similar icons available to you
-
+import { View, Text, StyleSheet, Image, FlatList } from "react-native";
+import { starterPack } from "../data/test";
 const ProgressBar = ({ progress, color }) => {
   return (
     <View style={styles.progressBarContainer}>
@@ -23,6 +15,19 @@ const ProgressBar = ({ progress, color }) => {
 };
 
 const MainScreen = ({ navigation, route }) => {
+  let dataEvent = [];
+  starterPack.forEach((event) => {
+    const age = event.age;
+    // Find the index of age in dataEvent
+    const index = dataEvent.findIndex((element) => element.id === age);
+    if (index === -1) {
+      // If age does not exist, create a new entry
+      dataEvent.push({ id: age, events: [event] });
+    } else {
+      // If age exists, push the event to existing entry
+      dataEvent[index].events.push(event);
+    }
+  });
   const [age, setAge] = useState(0); // Initializing age state
   const [progress, setProgress] = useState(0);
   const { name } = route.params;
@@ -69,13 +74,35 @@ const MainScreen = ({ navigation, route }) => {
           }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>{name}</Text>
-        <Text style={styles.Age}>Age: {age}</Text>
+        <View>
+          <Text style={styles.profileName}>{name}</Text>
+          <Text style={styles.Age}>Age: {age}</Text>
+        </View>
+
         <Text style={styles.bankBalance}>Bank Balance: ${bankBalance}</Text>
       </View>
 
       <View style={styles.detailsSection}>
-        <Text>Age: 0 years</Text>
+        <FlatList
+          data={dataEvent}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View
+            style={{
+              marginBottom: 10,
+            }}
+            >
+              <Text>{item.id} years old:</Text>
+              <FlatList
+                data={item.events}
+                keyExtractor={(event) => event.id}
+                renderItem={({ item: event }) => (
+                  <Text key={event.id}>- {event.title}</Text>
+                )}
+              />
+            </View>
+          )}
+        />
       </View>
       <View style={styles.timeBarContainer}>
         <ProgressBar progress={progress} color="#3498db" />

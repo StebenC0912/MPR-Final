@@ -25,11 +25,13 @@ function MainTab(props) {
         headerShown: false,
       }}
     >
-      <Tab.Screen name="MainScreen" component={MainScreen}
-      options={{
-        tabBarLabel: 'Home',
-      }}
-      initialParams={{ name: name }}
+      <Tab.Screen
+        name="MainScreen"
+        component={MainScreen}
+        options={{
+          tabBarLabel: "Home",
+        }}
+        initialParams={{ name: name }}
       />
       <Tab.Screen name="School" component={School} />
       <Tab.Screen name="Relationship" component={Relationship} />
