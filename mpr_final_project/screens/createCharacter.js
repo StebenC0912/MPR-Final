@@ -9,7 +9,9 @@ import {
   TextInput,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-const CreateCharacter = ({ navigation, route }) => {
+import { getFirestore, collection, addDoc } from "firebase/firestore"; // Import Firestore
+
+const CreateCharacter = ({ navigation }) => {
   const [name, setName] = useState("");
   const gender = [
     { label: "Male", value: 1 },
@@ -17,15 +19,33 @@ const CreateCharacter = ({ navigation, route }) => {
   ];
   const [pickedGender, setPickedGender] = useState("");
   const [isFocus, setIsFocus] = useState(false);
-  const handleStartButton = () => {
+  const db = getFirestore(); // Initialize Firestore
+
+  const handleStartButton = async () => {
     if (name === "") {
       Alert.alert("Please enter a name");
+      return;
     }
     if (pickedGender === "") {
-      Alert.alert("Please choose a gender")
+      Alert.alert("Please choose a gender");
+      return;
     }
-    navigation.navigate('Main', { name:name });
-  }
+
+    try {
+      // Add a document to the "characters" collection
+      const docRef = await addDoc(collection(db, "characters"), {
+        name: name,
+        gender: pickedGender,
+      });
+      console.log("Document written with ID: ", docRef.id);
+      navigation.navigate('Main', { name: name }); // Navigate after saving
+    } catch (error) {
+      console.error("Error writing document: ", error);
+      Alert.alert("Error", "Unable to create character.");
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -39,9 +59,7 @@ const CreateCharacter = ({ navigation, route }) => {
         <Text style={styles.text2}>Start a new life</Text>
 
         <View style={styles.maleButton}>
-          <TouchableOpacity
-          onPress={handleStartButton}
-          >
+          <TouchableOpacity onPress={handleStartButton}>
             <View style={styles.button1}>
               <Text
                 style={{
@@ -66,12 +84,12 @@ const CreateCharacter = ({ navigation, route }) => {
 
         <View style={styles.maleButton}>
           <Dropdown
-          selectedTextStyle={{
-            color: "#6B7682",
-            fontFamily: "OrelegaOne",
-            fontSize: 16,
-            textAlign: "center",
-          }}
+            selectedTextStyle={{
+              color: "#6B7682",
+              fontFamily: "OrelegaOne",
+              fontSize: 16,
+              textAlign: "center",
+            }}
             style={{
               width: 320,
               height: 70,
@@ -85,7 +103,6 @@ const CreateCharacter = ({ navigation, route }) => {
               alignSelf: "center",
               fontFamily: "OrelegaOne",
               paddingLeft: 10,
-              
             }}
             data={gender}
             labelField={"label"}
@@ -96,7 +113,7 @@ const CreateCharacter = ({ navigation, route }) => {
             placeholderStyle={StyleSheet.create({
               fontSize: 16,
               color: "#6B7682",
-                fontFamily: "OrelegaOne",
+              fontFamily: "OrelegaOne",
               textAlign: "center",
             })}
           />
@@ -182,7 +199,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     top: 150,
     marginBottom: 20,
-    
   },
   femaleButton: {
     display: "flex",

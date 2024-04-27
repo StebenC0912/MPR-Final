@@ -1,6 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Make sure to install these or use similar icons available to you
+import { useStats } from '../store/StatContext';
 
 const ProgressBar = ({ progress, color }) => {
     return (
@@ -10,114 +11,94 @@ const ProgressBar = ({ progress, color }) => {
     );
   };
   
-const MainScreen = ({navigation, route}) => {
-    const [age, setAge] = useState(0); // Initializing age state
+  const MainScreen = ({ navigation, route }) => {
+    const { stats, modifyStats, modifyBankBalance } = useStats();
+    const [age, setAge] = useState(0);
     const [progress, setProgress] = useState(0);
     const { name } = route.params;
-    const [bankBalance, setBankBalance] = useState(0);
-    const [health, setHealth] = useState(100);
-    const [happy, setHappy] = useState(100);
-    const [smart, setSmart] = useState(30);
-    const [look, setLook] = useState(20);
 
     useEffect(() => {
-        const secondTimer = setInterval(() => {
-            setProgress(prevProgress => {
-                const newProgress = prevProgress + 100 / (1 * 60); // Increment by the fraction per second
-                if (newProgress >= 100) {
-                    setAge(prevAge => prevAge + 1); // Increment age every 12 minutes
-                    return 0; // Reset progress after 12 minutes
-                }
-                return newProgress;
-            });
-        }, 1000); // Update every second
+      const interval = setInterval(() => {
+          setProgress(prevProgress => {
+              if (prevProgress >= 100) {
+                  incrementAge();
+                  return 0;
+              }
+              return prevProgress + 100 / (12 * 60);
+          });
+      }, 1000);
+      return () => clearInterval(interval);
+  }, []);
 
-        return () => clearInterval(secondTimer); // Clean up the interval on component unmount
-    }, []);
+  // Use a callback to increment age to encapsulate the condition checking
+  const incrementAge = useCallback(() => {
+      setAge(prevAge => {
+          const newAge = prevAge + 1;
+          // Move the side effects to an effect hook
+          if (newAge > 35) {
+              // Delay this update to the next effect cycle
+              requestAnimationFrame(() => {
+                  modifyStats({ health: -2 });
+              });
+          }
+          return newAge;
+      });
+  }, [modifyStats]);
 
-    const handleIncreaseAge = () => {
-        setAge(age + 1); // Manual increment age
-    };
-    useEffect(() => {
-        if (age > 35) {
-            setHealth(prevHealth => Math.max(0, prevHealth - 2));
-        }
-    }, [age]); // This effect triggers whenever 'age' changes
-
-  return (
-    
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        
-        <Text style={styles.headerTitle}>New Life</Text>
-      
-      </View>
-
-      <View style={styles.profileSection}>
-        <Image
-          source={{ uri: 'https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg' }}
-          style={styles.profileImage}
-        />
-     <Text style={styles.profileName}>{name}</Text>
-        <Text style={styles.Age}>Age: {age}</Text> 
-        <Text style={styles.bankBalance}>Bank Balance: ${bankBalance}</Text>
-      </View>
-
-      <View style={styles.detailsSection}>
-        <Text>Age: 0 years</Text>
-        
-      </View>
-      <View style={styles.timeBarContainer}>
+  const handleIncreaseAge = () => {
+      incrementAge();
+  };
+    return (
+        <ScrollView style={styles.container}>
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>New Life</Text>
+            </View>
+            <View style={styles.profileSection}>
+                <Image
+                    source={{ uri: 'https://i.pinimg.com/736x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg' }}
+                    style={styles.profileImage}
+                />
+                <Text style={styles.profileName}>{name}</Text>
+                <Text style={styles.Age}>Age: {age}</Text> 
+                <Text style={styles.bankBalance}>Bank Balance: ${stats.bankBalance}</Text>
+            </View>
+            <View style={styles.timeBarContainer}>
                 <ProgressBar progress={progress} color="#3498db" />
             </View>
-      <View style={styles.statsSection}>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Happy</Text>
-          <ProgressBar progress={happy} color="#ffeb3b" />
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Health</Text>
-       <ProgressBar progress={health} color="#4caf50" />
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Smart</Text>
-          <ProgressBar progress={smart} color="#2196f3" />
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Looks</Text>
-          <ProgressBar progress={look} color="#e91e63" />
-        </View>
-      </View>
-
-      <View style={styles.navBar}>
-      <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('School')}>
-          <FontAwesome5 name="school" size={24} color="white" />
-          <Text style={styles.navText}>School</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Assert')}>
-          <FontAwesome5 name="dollar-sign" size={24} color="white" />
-          <Text style={styles.navText}>Bank</Text>
-        </TouchableOpacity>
-
-
-        <TouchableOpacity style={styles.navItem} onPress={handleIncreaseAge}>
+            <View style={styles.statsSection}>
+                <Text style={styles.statLabel}>Happy: {stats.happy}%</Text>
+                <ProgressBar progress={stats.happy} color="#ffeb3b" />
+                <Text style={styles.statLabel}>Health: {stats.health}%</Text>
+                <ProgressBar progress={stats.health} color="#4caf50" />
+                <Text style={styles.statLabel}>Smart: {stats.smart}%</Text>
+                <ProgressBar progress={stats.smart} color="#2196f3" />
+                <Text style={styles.statLabel}>Looks: {stats.look}%</Text>
+                <ProgressBar progress={stats.look} color="#e91e63" />
+            </View>
+            <View style={styles.navBar}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('School')}>
+                    <FontAwesome5 name="school" size={24} color="white" />
+                    <Text style={styles.navText}>School</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Assert')}>
+                    <FontAwesome5 name="dollar-sign" size={24} color="white" />
+                    <Text style={styles.navText}>Bank</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navItem} onPress={handleIncreaseAge}>
                     <FontAwesome5 name="plus" size={24} color="white" />
                     <Text style={styles.navText}>Age</Text>
-          </TouchableOpacity>
-
-  <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Relationship')}>
-          <FontAwesome5 name="user-friends" size={24} color="white" />
-          <Text style={styles.navText}>Relationship</Text>
-        </TouchableOpacity>
-
-  <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Activity')}>
-          <FontAwesome5 name="briefcase" size={24} color="white" />
-          <Text style={styles.navText}>Jobs</Text>
-        </TouchableOpacity>
-</View>
-    </ScrollView>
-  );
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Relationship')}>
+                    <FontAwesome5 name="user-friends" size={24} color="white" />
+                    <Text style={styles.navText}>Relationship</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Activity')}>
+                    <FontAwesome5 name="briefcase" size={24} color="white" />
+                    <Text style={styles.navText}>Jobs</Text>
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({

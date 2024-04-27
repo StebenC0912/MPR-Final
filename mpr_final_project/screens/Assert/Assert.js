@@ -1,23 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-const ProgressBar = ({ progress, color }) => {
-    return (
-      <View style={styles.progressBarBackground}>
-        <View style={[styles.progressBarForeground, { width: `${progress}%`, backgroundColor: color }]} />
-      </View>
-    );
-  };
-  
-const Assert = () => {
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
+
+const Assert = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Assert</Text>
       </View>
       <View style={styles.content}>
-        <Text style={styles.label}>Loan</Text>
-        <Text style={styles.label}>Part-time Job</Text>
-   
+        <TouchableOpacity onPress={() => navigation.navigate('Loan')}>
+          <Text style={styles.label}>Loan</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('PartJob')}>
+          <Text style={styles.label}>Part-time Job</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -46,6 +43,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#34495e',
     paddingVertical: 10,
+    backgroundColor: '#ccc', // Light grey background for buttons
+    padding: 10,
+    marginVertical: 5, // Margin for spacing between buttons
   },
   progressBarBackground: {
     height: 20,
@@ -58,5 +58,6 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 10,
   },
-})
+});
+
 export default Assert;
