@@ -32,10 +32,6 @@ const MainScreen = ({ navigation, route }) => {
   const { name } = route.params;
 
   useEffect(() => {
-    // This will now be managed within the StatContext, no need to duplicate here
-  }, []);
-
-  useEffect(() => {
     if (stats.age >= 5 && !showSchoolAndRelationship) {
       Alert.alert(
         "Unlock new features",
