@@ -10,6 +10,7 @@ import { color } from "../constants/color";
 
 const MainScreen = ({ navigation, route }) => {
   const [dataEvent, setDataEvent] = useState([]);
+  const [progress, setProgress] = useState(0);
   const [showSchoolAndRelationship, setShowSchoolAndRelationship] = useState(false);
   const [showRemaining, setShowRemaining] = useState(false);
 
@@ -75,8 +76,8 @@ const MainScreen = ({ navigation, route }) => {
         { events: [chooseRandomEvent()], id: stats.age + 1 },
       ]);
     }
-
   };
+
   useEffect(() => {
     const secondTimer = setInterval(() => {
       setProgress(prevProgress => {
@@ -91,6 +92,7 @@ const MainScreen = ({ navigation, route }) => {
 
     return () => clearInterval(secondTimer); // Clean up the interval on component unmount
   }, [incrementAge]); // Include incrementAge in the dependency array
+
 
   return (
     <View style={styles.container}>
@@ -130,7 +132,7 @@ const MainScreen = ({ navigation, route }) => {
         />
       </View>
       <View style={styles.timeBarContainer}>
-        <ProgressBar progress={(stats.time % 12) * 8.33} color={color.colors.blue} />
+        <ProgressBar progress={progress} color={color.colors.blue} />
       </View>
       <View style={styles.statsSection}>
         <StatDisplay label="Happy" progress={stats.happy} color={color.colors.yellow} />
@@ -226,59 +228,28 @@ const styles = StyleSheet.create({
 
   detailsSection: {
     padding: 15,
-    backgroundColor: "#f0f8ff", // A light blue background
+    backgroundColor: "#f0f8ff",
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0", // Light grey border
+    borderBottomColor: "#e0e0e0",
     flex: 1,
     flexGrow: 1,
   },
   timeBarContainer: {
-    height: 20, // Set the height for the time progress bar container
-    width: "100%", // Set the width to full container width
-    backgroundColor: "#ddd", // A light background color for the progress bar background
+    height: 20, 
+    width: "100%", 
+    backgroundColor: "#ddd", 
   },
   statsSection: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: "#ffffff",
   },
-  stat: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  statLabel: {
-    fontSize: 16,
-    color: "#000",
-    marginRight: 5,
-  },
-  progressBarContainer: {
-    height: 20,
-    flex: 1,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 10,
-    overflow: "hidden", // Ensures the inner bar doesn't spill over
-  },
-  progressBar: {
-    height: "100%",
-    borderRadius: 10,
-  },
   navBar: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     paddingVertical: 10,
-    backgroundColor: "#3498db", // Adjust to the color in the image
-  },
-  navItem: {
-    alignItems: "center",
-  },
-  navIcon: {
-    marginBottom: 5,
-  },
-  navText: {
-    fontSize: 10,
-    color: "#ffffff", // Set text color to white
+    backgroundColor: "#3498db",
   },
 });
 export default MainScreen;
