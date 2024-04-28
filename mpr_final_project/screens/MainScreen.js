@@ -1,28 +1,36 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons"; // Make sure to install this or use similar icons available to you
 import { useStats } from "../store/StatContext";
 import { starterPack, randomEvent } from "../data/test";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc } from "firebase/firestore";
-import StatDisplay from "../components/layout/StatDisplay";
-import ProgressBar from "../components/layout/ProgressBar";
-import NavigationButton from "../components/ui/NavigationButton";
-import { color } from "../constants/color";
-
-
-// const ProgressBar = ({ progress, color }) => (
-//   <View style={styles.progressBarContainer}>
-//     <View
-//       style={[
-//         styles.progressBar,
-//         { width: `${progress}%`, backgroundColor: color },
-//       ]}
-//     />
-//   </View>
-// );
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
+const ProgressBar = ({ progress, color }) => (
+  <View style={styles.progressBarContainer}>
+    <View
+      style={[
+        styles.progressBar,
+        { width: `${progress}%`, backgroundColor: color },
+      ]}
+    />
+  </View>
+);
 
 const MainScreen = ({ navigation, route }) => {
   const [dataEvent, setDataEvent] = useState([]);
+  const [progress, setProgress] = useState(0);
   useEffect(() => {
     let newDataEvent = [];
     starterPack.forEach((event) => {
@@ -37,12 +45,10 @@ const MainScreen = ({ navigation, route }) => {
     setDataEvent(newDataEvent);
   }, []);
 
-  const { stats, modifyBankBalance, incrementTime } = useStats();
+  const { stats, incrementAge} = useStats();
   const { name } = route.params;
 
-  useEffect(() => {
-    // This will now be managed within the StatContext, no need to duplicate here
-  }, []);
+ 
   const dataEventByAge = useMemo(() => {
     const filteredEvents = randomEvent.filter(
       (event) => event.age === stats.age + 1
@@ -57,9 +63,11 @@ const MainScreen = ({ navigation, route }) => {
     const randomIndex = Math.floor(Math.random() * dataEventByAge.length);
     return dataEventByAge[randomIndex];
   };
+
   const handleIncreaseAge = () => {
-    incrementTime(12); // Add 12 minutes to time, which translates to one year
+    incrementAge(); // Directly increment age by 1 year
     if (dataEventByAge.length !== 0) {
+      // If there are events associated with the new age, add them to the dataEvent state
       setDataEvent((prevDataEvent) => [
         ...prevDataEvent,
         { events: [chooseRandomEvent()], id: stats.age + 1 },
@@ -67,6 +75,20 @@ const MainScreen = ({ navigation, route }) => {
     }
 
   };
+  useEffect(() => {
+    const secondTimer = setInterval(() => {
+      setProgress(prevProgress => {
+        const newProgress = prevProgress + 100 /(12* 60); // Increment by the fraction per second
+        if (newProgress >= 100) {
+          incrementAge(); // Use incrementAge from context to update age
+          return 0; // Reset progress
+        }
+        return newProgress;
+      });
+    }, 1000); // Update every second
+
+    return () => clearInterval(secondTimer); // Clean up the interval on component unmount
+  }, [incrementAge]); // Include incrementAge in the dependency array
 
   return (
     <View style={styles.container}>
@@ -106,10 +128,10 @@ const MainScreen = ({ navigation, route }) => {
         />
       </View>
       <View style={styles.timeBarContainer}>
-        <ProgressBar progress={(stats.time % 12) * 8.33} color="#3498db" />
+        <ProgressBar progress={progress} color="#3498db" />
       </View>
       <View style={styles.statsSection}>
-        {/* <View style={styles.stat}>
+        <View style={styles.stat}>
           <Text style={styles.statLabel}>Happy</Text>
           <ProgressBar progress={stats.happy} color="#ffeb3b" />
         </View>
@@ -124,14 +146,10 @@ const MainScreen = ({ navigation, route }) => {
         <View style={styles.stat}>
           <Text style={styles.statLabel}>Looks</Text>
           <ProgressBar progress={stats.look} color="#e91e63" />
-        </View> */}
-        <StatDisplay label="Happy" progress={stats.happy} color={color.colors.yellow} />
-        <StatDisplay label="Health" progress={stats.health} color={color.colors.green} />
-        <StatDisplay label="Smart" progress={stats.smart} color={color.colors.blue} />
-        <StatDisplay label="Looks" progress={stats.look} color={color.colors.pink} />
+        </View>
       </View>
       <View style={styles.navBar}>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigation.navigate("School")}
         >
@@ -162,32 +180,7 @@ const MainScreen = ({ navigation, route }) => {
         >
           <FontAwesome5 name="briefcase" size={24} color="white" />
           <Text style={styles.navText}>Ac</Text>
-        </TouchableOpacity> */}
-        <NavigationButton
-          icon="school"
-          text="School"
-          onPress={() => navigation.navigate("School")}
-        />
-        <NavigationButton
-          icon="dollar-sign"
-          text="Assert"
-          onPress={() => navigation.navigate("Assert")}
-        />
-        <NavigationButton
-          icon="plus"
-          text="Age"
-          onPress={handleIncreaseAge}
-        />
-        <NavigationButton
-          icon="user-friends"
-          text="Relationship"
-          onPress={() => navigation.navigate("Relationship")}
-        />
-        <NavigationButton
-          icon="briefcase"
-          text="Ac"
-          onPress={() => navigation.navigate("Activity")}
-        />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -195,7 +188,7 @@ const MainScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: color.colors.gray94,
+    backgroundColor: "#f0f0f0",
   },
   header: {
     flexDirection: "row",
@@ -258,27 +251,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#ffffff",
   },
-  // stat: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   marginVertical: 10,
-  // },
-  // statLabel: {
-  //   fontSize: 16,
-  //   color: "#000",
-  //   marginRight: 5,
-  // },
-  // progressBarContainer: {
-  //   height: 20,
-  //   flex: 1,
-  //   backgroundColor: "#e0e0e0",
-  //   borderRadius: 10,
-  //   overflow: "hidden", // Ensures the inner bar doesn't spill over
-  // },
-  // progressBar: {
-  //   height: "100%",
-  //   borderRadius: 10,
-  // },
+  stat: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  statLabel: {
+    fontSize: 16,
+    color: "#000",
+    marginRight: 5,
+  },
+  progressBarContainer: {
+    height: 20,
+    flex: 1,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+    overflow: "hidden", // Ensures the inner bar doesn't spill over
+  },
+  progressBar: {
+    height: "100%",
+    borderRadius: 10,
+  },
   navBar: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -286,15 +279,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "#3498db", // Adjust to the color in the image
   },
-  // navItem: {
-  //   alignItems: "center",
-  // },
+  navItem: {
+    alignItems: "center",
+  },
   navIcon: {
     marginBottom: 5,
   },
-  // navText: {
-  //   fontSize: 10,
-  //   color: "#ffffff", // Set text color to white
-  // },
+  navText: {
+    fontSize: 10,
+    color: "#ffffff", // Set text color to white
+  },
 });
 export default MainScreen;
