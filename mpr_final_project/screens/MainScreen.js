@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -9,8 +9,14 @@ import {
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons"; // Make sure to install this or use similar icons available to you
 import { useStats } from "../store/StatContext";
-import { starterPack } from "../data/test";
-
+import { starterPack, randomEvent } from "../data/test";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
 const ProgressBar = ({ progress, color }) => (
   <View style={styles.progressBarContainer}>
     <View
@@ -23,25 +29,51 @@ const ProgressBar = ({ progress, color }) => (
 );
 
 const MainScreen = ({ navigation, route }) => {
-  let dataEvent = [];
-  starterPack.forEach((event) => {
-    const age = event.age;
-    const index = dataEvent.findIndex((element) => element.id === age);
-    if (index === -1) {
-      dataEvent.push({ id: age, events: [event] });
-    } else {
-      dataEvent[index].events.push(event);
-    }
-  });
+  const [dataEvent, setDataEvent] = useState([]);
+  useEffect(() => {
+    let newDataEvent = [];
+    starterPack.forEach((event) => {
+      const age = event.age;
+      const index = newDataEvent.findIndex((element) => element.id === age);
+      if (index === -1) {
+        newDataEvent.push({ id: age, events: [event] });
+      } else {
+        newDataEvent[index].events.push(event);
+      }
+    });
+    setDataEvent(newDataEvent);
+  }, []);
 
   const { stats, modifyBankBalance, incrementTime } = useStats();
   const { name } = route.params;
-  const handleIncreaseAge = () => {
-    incrementTime(12); // Add 12 minutes to time, which translates to one year
-  };
+
   useEffect(() => {
     // This will now be managed within the StatContext, no need to duplicate here
   }, []);
+  const dataEventByAge = useMemo(() => {
+    const filteredEvents = randomEvent.filter(
+      (event) => event.age === stats.age + 1
+    );
+    return filteredEvents;
+  }, [randomEvent, stats.age]);
+
+  const chooseRandomEvent = () => {
+    if (dataEventByAge.length === 0) {
+      return null; // Return null if there are no events for the current age
+    }
+    const randomIndex = Math.floor(Math.random() * dataEventByAge.length);
+    return dataEventByAge[randomIndex];
+  };
+  const handleIncreaseAge = () => {
+    incrementTime(12); // Add 12 minutes to time, which translates to one year
+    if (dataEventByAge.length !== 0) {
+      setDataEvent((prevDataEvent) => [
+        ...prevDataEvent,
+        { events: [chooseRandomEvent()], id: stats.age + 1 },
+      ]);
+    }
+
+  };
 
   return (
     <View style={styles.container}>

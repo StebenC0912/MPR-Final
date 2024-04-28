@@ -9,9 +9,16 @@ import {
   TextInput,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc } from "firebase/firestore"; // Import Firestore
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore"; // Import Firestore
 
 const CreateCharacter = ({ navigation, route }) => {
+  const db = getFirestore(); // Initialize Firestore
   const { uid } = route.params;
   const [name, setName] = useState("");
   const gender = [
@@ -52,7 +59,7 @@ const CreateCharacter = ({ navigation, route }) => {
   }, [uid]);
 
   console.log("Character:", character);
-  const db = getFirestore(); // Initialize Firestore
+  // Initialize Firestore
 
   const handleStartButton = async () => {
     if (name === "") {
@@ -63,11 +70,21 @@ const CreateCharacter = ({ navigation, route }) => {
       Alert.alert("Please choose a gender");
       return;
     }
-    if (
-      !found ||
-      name === character.name ||
-      pickedGender.label === character.gender
-    ) {
+    if (!found) {
+      try {
+        // Add a document to the "characters" collection
+        const docRef = await addDoc(collection(db, "characters"), {
+          name: name,
+          gender: pickedGender.label,
+          uid: uid,
+        });
+        console.log("Document written with ID: ", docRef.id);
+        navigation.navigate("Main", { name: name, id: uid }); // Navigate after saving
+      } catch (error) {
+        console.error("Error writing document: ", error);
+        Alert.alert("Error", "Unable to create character.");
+      }
+    } else if (name !== character.name || pickedGender.label !== character.gender) {
       try {
         // delete the existing character
         const querySnapshot = await getDocs(collection(db, "characters"));
@@ -78,20 +95,19 @@ const CreateCharacter = ({ navigation, route }) => {
             deleteDoc(doc.ref);
           }
         });
-        // Add a document to the "characters" collection
+
         const docRef = await addDoc(collection(db, "characters"), {
           name: name,
           gender: pickedGender.label,
           uid: uid,
         });
         console.log("Document written with ID: ", docRef.id);
-        navigation.navigate("Main", { name: name }); // Navigate after saving
+        navigation.navigate("Main", { name: name, id: uid }); // Navigate after saving
       } catch (error) {
-        console.error("Error writing document: ", error);
-        Alert.alert("Error", "Unable to create character.");
+        console.error("Error deleting character:", error.message);
       }
     } else {
-      navigation.navigate("Main", { name: name });
+      navigation.navigate("Main", { name: name, id: uid }); // Navigate after saving
     }
   };
 
