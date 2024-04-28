@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage mới
 
+import Header from '../../components/layout/Header';
+
 const School = ({ navigation }) => {
   const [currentLevel, setCurrentLevel] = useState(0); // State để lưu trữ cấp học hiện tại
   const [schools, setSchools] = useState([
@@ -82,9 +84,7 @@ const School = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>School</Text>
-      </View>
+      <Header text="School"/>
       <View style={styles.content}>
         {schools.map((school, schoolIndex) => (
           // Hiển thị chỉ các cấp học đã hoàn thành hoặc cấp học hiện tại

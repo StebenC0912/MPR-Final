@@ -1,19 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import Header from '../../components/layout/Header';
+import PrimaryButton from '../../components/ui/PrimaryButton';
 
 const Assert = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Assert</Text>
-      </View>
+      <Header text="Assert"/>
       <View style={styles.content}>
-        <TouchableOpacity onPress={() => navigation.navigate('Job')}>
-          <Text style={styles.label}>Job</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('PartJob')}>
-          <Text style={styles.label}>Part-time Job</Text>
-        </TouchableOpacity>
+        <PrimaryButton onPress={() => navigation.navigate('Job')} text="Job"/>
+        <PrimaryButton onPress={() => navigation.navigate('PartJob')} text="Part-Time Job"/>
       </View>
     </View>
   );
@@ -24,27 +20,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ecf0f1',
   },
-  header: {
-    backgroundColor: '#34495e',
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerText: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   content: {
     padding: 20,
-  },
-  label: {
-    fontSize: 18,
-    color: '#34495e',
-    paddingVertical: 10,
-    backgroundColor: '#ccc',
-    padding: 10,
-    marginVertical: 5,
   },
 });
 

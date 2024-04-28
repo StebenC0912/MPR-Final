@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useStats } from '../../store/StatContext'; // Adjust the path as necessary
+import Header from '../../components/layout/Header';
 
 const Shop = ({ navigation }) => {
   const { modifyStats, modifyBankBalance } = useStats();
@@ -62,9 +63,7 @@ const Shop = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Shopping</Text>
-      </View>
+      <Header text="Shopping"/>
       <View style={styles.content}>
         {items.map((item, index) => (
           <TouchableOpacity key={index} style={styles.item} onPress={() => handlePurchase(item)}>
@@ -81,17 +80,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ecf0f1',
-  },
-  header: {
-    backgroundColor: '#34495e',
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerText: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   content: {
     padding: 20,

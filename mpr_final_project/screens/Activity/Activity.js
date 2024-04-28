@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import { useStats } from '../../store/StatContext'; // Adjust the path as necessary
+import Header from '../../components/layout/Header';
+import PrimaryButton from '../../components/ui/PrimaryButton';
 
 const Activity = () => {
   const { modifyStats, modifyBankBalance } = useStats();
@@ -10,6 +12,14 @@ const Activity = () => {
   const handleHospitalVisit = () => {
     modifyBankBalance(-500); // Subtract $500 from bank balance
     modifyStats({ health: 20 }); // Increase health by 20%
+    Alert.alert(
+      'Hospital Visit',
+      'You have paid $500 and increased your health by 20%.',
+      [
+        { text: 'OK', onPress: () => console.log('OK Pressed') }
+      ],
+      { cancelable: false }
+    );
   };
 
   const handleShoppingPress = () => {
@@ -18,16 +28,10 @@ const Activity = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Activity</Text>
-      </View>
+      <Header text="Activity"/>
       <View style={styles.content}>
-        <TouchableOpacity onPress={handleHospitalVisit}>
-          <Text style={styles.label}>Hospital</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleShoppingPress}>
-          <Text style={styles.label}>Shopping</Text>
-        </TouchableOpacity>
+        <PrimaryButton onPress={handleHospitalVisit} text="Hospital"/>
+        <PrimaryButton onPress={handleShoppingPress} text="Shopping"/>
       </View>
     </View>
   );

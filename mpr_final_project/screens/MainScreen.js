@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList} from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons"; // Make sure to install this or use similar icons available to you
+import { View, Text, StyleSheet, Image, Alert, FlatList} from "react-native";
 import { useStats } from "../store/StatContext";
 import { starterPack, randomEvent } from "../data/test";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc } from "firebase/firestore";
@@ -9,20 +8,11 @@ import ProgressBar from "../components/layout/ProgressBar";
 import NavigationButton from "../components/ui/NavigationButton";
 import { color } from "../constants/color";
 
-
-// const ProgressBar = ({ progress, color }) => (
-//   <View style={styles.progressBarContainer}>
-//     <View
-//       style={[
-//         styles.progressBar,
-//         { width: `${progress}%`, backgroundColor: color },
-//       ]}
-//     />
-//   </View>
-// );
-
 const MainScreen = ({ navigation, route }) => {
   const [dataEvent, setDataEvent] = useState([]);
+  const [showSchoolAndRelationship, setShowSchoolAndRelationship] = useState(false);
+  const [showRemaining, setShowRemaining] = useState(false);
+
   useEffect(() => {
     let newDataEvent = [];
     starterPack.forEach((event) => {
@@ -43,6 +33,24 @@ const MainScreen = ({ navigation, route }) => {
   useEffect(() => {
     // This will now be managed within the StatContext, no need to duplicate here
   }, []);
+
+  useEffect(() => {
+    if (stats.age >= 5 && !showSchoolAndRelationship) {
+      Alert.alert(
+        "Unlock new features",
+        "School and Relationship features are now unlocked!",
+        [{ text: "OK", onPress: () => setShowSchoolAndRelationship(true) }]
+      );
+    }
+    if (stats.age >= 18 && !showRemaining) {
+      Alert.alert(
+        "Unlock new features",
+        "Assert and Activity features are now unlocked!",
+        [{ text: "OK", onPress: () => setShowRemaining(true) }]
+      );
+    }
+  }, [stats.age]);
+
   const dataEventByAge = useMemo(() => {
     const filteredEvents = randomEvent.filter(
       (event) => event.age === stats.age + 1
@@ -106,88 +114,48 @@ const MainScreen = ({ navigation, route }) => {
         />
       </View>
       <View style={styles.timeBarContainer}>
-        <ProgressBar progress={(stats.time % 12) * 8.33} color="#3498db" />
+        <ProgressBar progress={(stats.time % 12) * 8.33} color={color.colors.blue} />
       </View>
       <View style={styles.statsSection}>
-        {/* <View style={styles.stat}>
-          <Text style={styles.statLabel}>Happy</Text>
-          <ProgressBar progress={stats.happy} color="#ffeb3b" />
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Health</Text>
-          <ProgressBar progress={stats.health} color="#4caf50" />
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Smart</Text>
-          <ProgressBar progress={stats.smart} color="#2196f3" />
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Looks</Text>
-          <ProgressBar progress={stats.look} color="#e91e63" />
-        </View> */}
         <StatDisplay label="Happy" progress={stats.happy} color={color.colors.yellow} />
         <StatDisplay label="Health" progress={stats.health} color={color.colors.green} />
         <StatDisplay label="Smart" progress={stats.smart} color={color.colors.blue} />
         <StatDisplay label="Looks" progress={stats.look} color={color.colors.pink} />
       </View>
       <View style={styles.navBar}>
-        {/* <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("School")}
-        >
-          <FontAwesome5 name="school" size={24} color="white" />
-          <Text style={styles.navText}>School</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Assert")}
-        >
-          <FontAwesome5 name="dollar-sign" size={24} color="white" />
-          <Text style={styles.navText}>Assert</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={handleIncreaseAge}>
-          <FontAwesome5 name="plus" size={24} color="white" />
-          <Text style={styles.navText}>Age</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Relationship")}
-        >
-          <FontAwesome5 name="user-friends" size={24} color="white" />
-          <Text style={styles.navText}>Relationship</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Activity")}
-        >
-          <FontAwesome5 name="briefcase" size={24} color="white" />
-          <Text style={styles.navText}>Ac</Text>
-        </TouchableOpacity> */}
-        <NavigationButton
-          icon="school"
-          text="School"
-          onPress={() => navigation.navigate("School")}
-        />
-        <NavigationButton
-          icon="dollar-sign"
-          text="Assert"
-          onPress={() => navigation.navigate("Assert")}
-        />
+        {showSchoolAndRelationship && (
+          <>
+            <NavigationButton
+              icon="school"
+              text="School"
+              onPress={() => navigation.navigate("School")}
+            />
+            <NavigationButton
+              icon="user-friends"
+              text="Relationship"
+              onPress={() => navigation.navigate("Relationship")}
+            />
+          </>
+        )}
         <NavigationButton
           icon="plus"
           text="Age"
           onPress={handleIncreaseAge}
         />
-        <NavigationButton
-          icon="user-friends"
-          text="Relationship"
-          onPress={() => navigation.navigate("Relationship")}
-        />
-        <NavigationButton
-          icon="briefcase"
-          text="Ac"
-          onPress={() => navigation.navigate("Activity")}
-        />
+        {showRemaining && (
+          <>
+            <NavigationButton
+              icon="dollar-sign"
+              text="Assert"
+              onPress={() => navigation.navigate("Assert")}
+            />
+            <NavigationButton
+              icon="briefcase"
+              text="Activities"
+              onPress={() => navigation.navigate("Activity")}
+            />
+          </>
+        )}
       </View>
     </View>
   );
