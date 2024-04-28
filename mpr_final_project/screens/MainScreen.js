@@ -27,7 +27,7 @@ const MainScreen = ({ navigation, route }) => {
     setDataEvent(newDataEvent);
   }, []);
 
-  const { stats, modifyBankBalance, incrementTime } = useStats();
+  const { stats, incrementAge} = useStats();
   const { name } = route.params;
 
   useEffect(() => {
@@ -65,9 +65,11 @@ const MainScreen = ({ navigation, route }) => {
     const randomIndex = Math.floor(Math.random() * dataEventByAge.length);
     return dataEventByAge[randomIndex];
   };
+
   const handleIncreaseAge = () => {
-    incrementTime(12); // Add 12 minutes to time, which translates to one year
+    incrementAge(); // Directly increment age by 1 year
     if (dataEventByAge.length !== 0) {
+      // If there are events associated with the new age, add them to the dataEvent state
       setDataEvent((prevDataEvent) => [
         ...prevDataEvent,
         { events: [chooseRandomEvent()], id: stats.age + 1 },
@@ -75,6 +77,20 @@ const MainScreen = ({ navigation, route }) => {
     }
 
   };
+  useEffect(() => {
+    const secondTimer = setInterval(() => {
+      setProgress(prevProgress => {
+        const newProgress = prevProgress + 100 /(12* 60); // Increment by the fraction per second
+        if (newProgress >= 100) {
+          incrementAge(); // Use incrementAge from context to update age
+          return 0; // Reset progress
+        }
+        return newProgress;
+      });
+    }, 1000); // Update every second
+
+    return () => clearInterval(secondTimer); // Clean up the interval on component unmount
+  }, [incrementAge]); // Include incrementAge in the dependency array
 
   return (
     <View style={styles.container}>
@@ -163,7 +179,7 @@ const MainScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: color.colors.gray94,
+    backgroundColor: "#f0f0f0",
   },
   header: {
     flexDirection: "row",
@@ -226,27 +242,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#ffffff",
   },
-  // stat: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   marginVertical: 10,
-  // },
-  // statLabel: {
-  //   fontSize: 16,
-  //   color: "#000",
-  //   marginRight: 5,
-  // },
-  // progressBarContainer: {
-  //   height: 20,
-  //   flex: 1,
-  //   backgroundColor: "#e0e0e0",
-  //   borderRadius: 10,
-  //   overflow: "hidden", // Ensures the inner bar doesn't spill over
-  // },
-  // progressBar: {
-  //   height: "100%",
-  //   borderRadius: 10,
-  // },
+  stat: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  statLabel: {
+    fontSize: 16,
+    color: "#000",
+    marginRight: 5,
+  },
+  progressBarContainer: {
+    height: 20,
+    flex: 1,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+    overflow: "hidden", // Ensures the inner bar doesn't spill over
+  },
+  progressBar: {
+    height: "100%",
+    borderRadius: 10,
+  },
   navBar: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -254,15 +270,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "#3498db", // Adjust to the color in the image
   },
-  // navItem: {
-  //   alignItems: "center",
-  // },
+  navItem: {
+    alignItems: "center",
+  },
   navIcon: {
     marginBottom: 5,
   },
-  // navText: {
-  //   fontSize: 10,
-  //   color: "#ffffff", // Set text color to white
-  // },
+  navText: {
+    fontSize: 10,
+    color: "#ffffff", // Set text color to white
+  },
 });
 export default MainScreen;
