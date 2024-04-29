@@ -1,23 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Header from '../../components/layout/Header';
-import { useNavigation } from '@react-navigation/native'; // Import thư viện navigation
-import { color } from '../../constants/color';
-import PrimaryButton from '../../components/ui/PrimaryButton';
 import { useNavigation } from '@react-navigation/native';
-
-const ListItem = ({ item, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={styles.listItem}>
-    <PrimaryButton text={item.name} />
-  </TouchableOpacity>
-);
+import { color } from '../../constants/color';
 
 const Relationship = () => {
   const navigation = useNavigation();
+
   const [parents, setParents] = useState([
     { id: 1, name: 'Dad' },
-    { id: 2, name: 'Mom' },
+    { id: 2, name: 'Mom' },    
   ]);
+
   const [friends, setFriends] = useState([
     { id: 1, name: 'Phuc' },
     { id: 2, name: 'Hien' },
@@ -27,17 +21,6 @@ const Relationship = () => {
   const handleInteraction = (person) => {
     navigation.navigate('Interaction', { person });
   };
-
-  const renderSection = (title, data) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <FlatList
-        data={data}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <ListItem item={item} onPress={() => handleInteraction(item)} />}
-      />
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -59,8 +42,6 @@ const Relationship = () => {
             </TouchableOpacity>
           ))}
         </View>
-        {renderSection("Parents", parents)}
-        {renderSection("Friends", friends)}
       </View>
     </View>
   );
@@ -90,9 +71,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     textAlign: "center"
-  },
-  listItem: {
-    marginBottom: 10,
   },
 });
 
