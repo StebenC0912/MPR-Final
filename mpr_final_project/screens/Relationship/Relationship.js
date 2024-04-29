@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Header from '../../components/layout/Header';
 import { useNavigation } from '@react-navigation/native';
 import { color } from '../../constants/color';
@@ -10,6 +11,7 @@ const Relationship = () => {
   const [parents, setParents] = useState([
     { id: 1, name: 'Dad' },
     { id: 2, name: 'Mom' },    
+    { id: 2, name: 'Mom' },    
   ]);
 
   const [friends, setFriends] = useState([
@@ -18,6 +20,7 @@ const Relationship = () => {
     { id: 3, name: 'Lee' },
   ]);
 
+  // Hàm xử lý khi nhấn vào một người bạn hoặc phụ huynh
   const handleInteraction = (person) => {
     navigation.navigate('Interaction', { person });
   };
