@@ -45,6 +45,11 @@ const MainScreen = ({ navigation, route }) => {
         "Assert and Activity features are now unlocked!",
         [{ text: "OK", onPress: () => setShowRemaining(true) }]
       );
+      Alert.alert(
+        "Check your bank balance",
+        "Your parents give you $10,000!",
+        [{ text: "OK", onPress: () => setShowRemaining(true) }]
+      );
     }
   }, [stats.age]);
 

@@ -6,7 +6,6 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatProvider } from './store/StatContext';
 
-
 import IntroScreen from './screens/IntroScreen';
 import CreateCharacter from './screens/createCharacter';
 import AuthenticationScreen from './screens/authenticationScreen';
@@ -20,8 +19,8 @@ import Job from './screens/Assert/Job';
 import Shop from './screens/Activity/Shop';
 import Interaction from './screens/Relationship/Interaction';
 import EndGame from './screens/EndGame';
-const Stack = createStackNavigator();
 
+const Stack = createStackNavigator();
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({

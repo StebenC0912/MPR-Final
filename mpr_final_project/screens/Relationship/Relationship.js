@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Header from '../../components/layout/Header';
-import PrimaryButton from '../../components/ui/PrimaryButton';
 import { useNavigation } from '@react-navigation/native'; // Import thư viện navigation
+import { color } from '../../constants/color';
 
 const Relationship = () => {
   const navigation = useNavigation();
@@ -32,7 +32,7 @@ const Relationship = () => {
           <Text style={styles.sectionTitle}>Parents</Text>
           {parents.map((parent) => (
             <TouchableOpacity key={parent.id} onPress={() => handleInteraction(parent)}>
-              <PrimaryButton text={parent.name}/>
+              <Text style={styles.btn}>{parent.name}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -40,7 +40,7 @@ const Relationship = () => {
           <Text style={styles.sectionTitle}>Friends</Text>
           {friends.map((friend) => (
             <TouchableOpacity key={friend.id} onPress={() => handleInteraction(friend)}>
-              <PrimaryButton text={friend.name}/>
+              <Text style={styles.btn}>{friend.name}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -64,6 +64,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  btn: {
+    fontSize: 18,
+    color: color.colors.darkBlue,
+    paddingVertical: 10,
+    backgroundColor: color.colors.darkGray,
+    marginTop: 10,
+    padding: 10,
+    textAlign: "center"
   },
 });
 
