@@ -7,6 +7,8 @@ import StatDisplay from "../components/layout/StatDisplay";
 import ProgressBar from "../components/layout/ProgressBar";
 import NavigationButton from "../components/ui/NavigationButton";
 import { color } from "../constants/color";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 
 const MainScreen = ({ navigation, route }) => {
@@ -157,10 +159,22 @@ const MainScreen = ({ navigation, route }) => {
         <ProgressBar progress={progress} color={color.colors.blue} />
       </View>
       <View style={styles.statsSection}>
+      <View style={styles.statItem}>
+        <Icon name="mood" size={20} color="#FFD700" style={styles.iconStyle} />
         <StatDisplay label="Happy" progress={stats.happy} color={color.colors.yellow} />
+      </View>
+      <View style={styles.statItem}>
+        <Icon name="favorite" size={20} color="#FF6347" style={styles.iconStyle} />
         <StatDisplay label="Health" progress={stats.health} color={color.colors.green} />
+      </View>
+      <View style={styles.statItem}>
+      <Icon name="lightbulb" size={20} color="#4682B4" style={styles.iconStyle} />
         <StatDisplay label="Smart" progress={stats.smart} color={color.colors.blue} />
+      </View>
+      <View style={styles.statItem}>
+      <Icon name="face" size={20} color="#FFC0CB" style={styles.iconStyle} />
         <StatDisplay label="Looks" progress={stats.look} color={color.colors.pink} />
+      </View>
       </View>
       <View style={styles.navBar}>
         {showSchoolAndRelationship && (
@@ -272,6 +286,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     backgroundColor: "#3498db",
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5, // Add spacing between each stat item
+    paddingLeft: 1, 
+  },
+  iconStyle: {
+    marginRight: 3, // Add space between the icon and the label
   },
 });
 export default MainScreen;
