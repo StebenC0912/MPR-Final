@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Header from '../../components/layout/Header';
 import { useNavigation } from '@react-navigation/native';
 import { color } from '../../constants/color';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Relationship = () => {
   const navigation = useNavigation();
@@ -18,7 +19,6 @@ const Relationship = () => {
     { id: 3, name: 'Lee' },
   ]);
 
-  // Hàm xử lý khi nhấn vào một người bạn hoặc phụ huynh
   const handleInteraction = (person) => {
     navigation.navigate('Interaction', { person });
   };
@@ -28,7 +28,9 @@ const Relationship = () => {
       <Header text="Relationship"/>
       <View style={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Parents</Text>
+          <Text style={styles.sectionTitle}>
+           <Icon name="family-restroom" size={24} color="#007AFF" /> Parents
+          </Text>
           {parents.map((parent) => (
             <TouchableOpacity key={parent.id} onPress={() => handleInteraction(parent)}>
               <Text style={styles.btn}>{parent.name}</Text>
@@ -36,7 +38,9 @@ const Relationship = () => {
           ))}
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Friends</Text>
+          <Text style={styles.sectionTitle}>
+            <Icon name="people" size={24} color="#007AFF" /> Friends
+          </Text>
           {friends.map((friend) => (
             <TouchableOpacity key={friend.id} onPress={() => handleInteraction(friend)}>
               <Text style={styles.btn}>{friend.name}</Text>
