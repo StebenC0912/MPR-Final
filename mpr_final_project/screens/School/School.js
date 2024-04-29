@@ -1,65 +1,77 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useStats } from '../../store/StatContext'; // Adjust the path as necessary
 import Header from '../../components/layout/Header';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const School = ({ navigation }) => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [schools, setSchools] = useState([
     {
-      name: 'Tiểu học',
-      subjects: ['Toán', 'Văn', 'Anh'],
+      name: 'Elementary School',
+      subjects: ['Math', 'Literature', 'English'],
       completed: [false, false, false],
       isCompleted: false
     },
     {
-      name: 'Trung học cơ sở',
-      subjects: ['Toán', 'Văn', 'Anh', 'Khoa Học'],
+      name: 'Middle School',
+      subjects: ['Math', 'Literature', 'English', 'Science'],
       completed: [false, false, false, false],
       isCompleted: false
     },
     {
-      name: 'Trung học phổ thông',
-      subjects: ['Toán', 'Văn', 'Anh', 'Khoa Học', 'Xã hội'],
+      name: 'High School',
+      subjects: ['Math', 'Literature', 'English', 'Science', 'Social Studies'],
       completed: [false, false, false, false, false],
       isCompleted: false
     },
     {
-      name: 'Đại học',
-      subjects: ['Nguyên lí máy tính', 'Lập Trình', 'Triết học'],
+      name: 'University',
+      subjects: ['Computer Science Principles', 'Programming', 'Philosophy'],
       completed: [false, false, false],
       isCompleted: false
     },
+    {
+      name: 'PhD',
+      subjects: ['Advanced Research', 'Thesis Writing'],
+      completed: [false, false],
+      isCompleted: false
+    },
+    {
+      name: 'Professor',
+      subjects: ['Teaching', 'Research', 'Public Speaking'],
+      completed: [false, false, false],
+      isCompleted: false
+    }
   ]);
 
   useEffect(() => {
-    retrieveLevel();
+    const fetchCurrentLevel = async () => {
+      try {
+        const storedLevel = await AsyncStorage.getItem('currentLevel');
+        if (storedLevel !== null) {
+          setCurrentLevel(parseInt(storedLevel));
+        }
+      } catch (error) {
+        console.error('Failed to fetch the current level from storage', error);
+      }
+    };
+
+    fetchCurrentLevel();
   }, []);
 
   useEffect(() => {
-    saveLevel();
-  }, [currentLevel]);
-
-  const retrieveLevel = async () => {
-    try {
-      const level = await AsyncStorage.getItem('currentLevel');
-      if (level !== null) {
-        setCurrentLevel(parseInt(level));
+    const saveCurrentLevel = async () => {
+      try {
+        await AsyncStorage.setItem('currentLevel', currentLevel.toString());
+      } catch (error) {
+        console.error('Failed to save the current level to storage', error);
       }
-    } catch (error) {
-      console.error('Error retrieving saved level: ', error);
-    }
-  };
+    };
 
-  const saveLevel = async () => {
-    try {
-      await AsyncStorage.setItem('currentLevel', currentLevel.toString());
-    } catch (error) {
-      console.error('Error saving level: ', error);
-    }
-  };
-
+    saveCurrentLevel();
+  }, [currentLevel]);
   const handleSubjectPress = (schoolIndex, subjectIndex) => {
     const updatedSchools = [...schools];
     updatedSchools[schoolIndex].completed[subjectIndex] = true;
@@ -82,7 +94,7 @@ const School = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Header text="School"/>
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
         {schools.map((school, schoolIndex) => (
           (school.isCompleted || schoolIndex === currentLevel) && (
             <View key={schoolIndex} style={styles.schoolContainer}>
@@ -101,12 +113,12 @@ const School = ({ navigation }) => {
                 </TouchableOpacity>
               ))}
             </View>
+            
           )
         ))}
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Job', { currentLevel })}>
+      </ScrollView><TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Job', { currentLevel })}>
           <Text style={styles.buttonText}>Check Job Opportunities</Text>
         </TouchableOpacity>
-      </View>
     </View>
   );
 };

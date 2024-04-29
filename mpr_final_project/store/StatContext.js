@@ -48,14 +48,7 @@ function statReducer(state, action) {
           age: newAge,
           bankBalance: newBankBalance
         };
-        case APPLY_EVENT_EFFECT:
-          return {
-              ...state,
-              happy: Math.max(0, state.happy + action.payload.happy),
-              health: Math.max(0, state.health + action.payload.health),
-              smart: Math.max(0, state.smart + action.payload.smart),
-              look: Math.max(0, state.look + action.payload.look)
-          };
+        
     default:
       return state;
   }
