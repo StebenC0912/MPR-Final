@@ -75,8 +75,7 @@ export const StatProvider = ({ children }) => {
     dispatch({ type: APPLY_EVENT_EFFECT, payload: effects });
 };
   return (
-    <StatContext.Provider value={{
-      stats: state,
+    <StatContext.Provider value={{stats: state, dispatch,
       modifyStats,
       modifyBankBalance,
       incrementAge,

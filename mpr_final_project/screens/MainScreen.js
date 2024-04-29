@@ -8,12 +8,14 @@ import ProgressBar from "../components/layout/ProgressBar";
 import NavigationButton from "../components/ui/NavigationButton";
 import { color } from "../constants/color";
 
+
 const MainScreen = ({ navigation, route }) => {
   const [dataEvent, setDataEvent] = useState([]);
   const [progress, setProgress] = useState(0);
   const [showSchoolAndRelationship, setShowSchoolAndRelationship] = useState(false);
   const [showRemaining, setShowRemaining] = useState(false);
-
+ 
+  
   useEffect(() => {
     let newDataEvent = [];
     starterPack.forEach((event) => {
@@ -28,7 +30,7 @@ const MainScreen = ({ navigation, route }) => {
     setDataEvent(newDataEvent);
   }, []);
 
-  const { stats, incrementAge} = useStats();
+  const { stats, incrementAge, dispatch} = useStats();
   const { name } = route.params;
 
   useEffect(() => {
@@ -67,18 +69,21 @@ const MainScreen = ({ navigation, route }) => {
     const randomIndex = Math.floor(Math.random() * dataEventByAge.length);
     return dataEventByAge[randomIndex];
   };
-
+  const event = chooseRandomEvent(); 
   const handleIncreaseAge = () => {
-    incrementAge(); // Directly increment age by 1 year
-    
-    if (dataEventByAge.length !== 0) {
-      // If there are events associated with the new age, add them to the dataEvent state
-      setDataEvent((prevDataEvent) => [
-        ...prevDataEvent,
-        { events: [chooseRandomEvent()], id: stats.age + 1, },
-      ]);
+    incrementAge(); // Ensure this function is compatible with your state management
+    const event = chooseRandomEvent();
+    if (event) {
+        dispatch({
+            type: 'MODIFY_STATS',
+            payload: event.effects
+        });
+        setDataEvent(prevDataEvent => [
+            ...prevDataEvent,
+            { events: [event], id: stats.age + 1 }
+        ]);
     }
-  };
+  }
 
   useEffect(() => {
     const secondTimer = setInterval(() => {

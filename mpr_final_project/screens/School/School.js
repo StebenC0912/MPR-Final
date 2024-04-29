@@ -126,37 +126,47 @@ const School = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ecf0f1',
+    backgroundColor: '#f4f4f8',
   },
   content: {
     padding: 20,
   },
   schoolContainer: {
     marginBottom: 20,
+    padding: 15,
+    backgroundColor: '#ffffff',  // White background for cards
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   schoolName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   subjectButton: {
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 10,
+    backgroundColor: '#3498db',
   },
   subjectButtonText: {
     color: '#ffffff',
     fontSize: 16,
+    textAlign: 'center',
   },
   button: {
     marginTop: 20,
-    backgroundColor: '#3498db',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#34c8db',  // Slightly different button color to stand out
+    padding: 12,
+    borderRadius: 8,
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
   }
 });
