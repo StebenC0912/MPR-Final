@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage mới
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useStats } from '../../store/StatContext'; // Adjust the path as necessary
 import Header from '../../components/layout/Header';
 
 const School = ({ navigation }) => {
-  const [currentLevel, setCurrentLevel] = useState(0); // State để lưu trữ cấp học hiện tại
+  const [currentLevel, setCurrentLevel] = useState(0);
   const [schools, setSchools] = useState([
     {
       name: 'Tiểu học',
       subjects: ['Toán', 'Văn', 'Anh'],
       completed: [false, false, false],
-      isCompleted: false // Trạng thái hoàn thành của cấp học
+      isCompleted: false
     },
     {
       name: 'Trung học cơ sở',
@@ -34,16 +34,13 @@ const School = ({ navigation }) => {
   ]);
 
   useEffect(() => {
-    // Khi component được render, kiểm tra xem đã lưu trạng thái cấp học trước đó không
     retrieveLevel();
   }, []);
 
   useEffect(() => {
-    // Mỗi khi currentLevel thay đổi, lưu trạng thái cấp học mới
     saveLevel();
   }, [currentLevel]);
 
-  // Hàm lấy trạng thái cấp học từ AsyncStorage
   const retrieveLevel = async () => {
     try {
       const level = await AsyncStorage.getItem('currentLevel');
@@ -55,7 +52,6 @@ const School = ({ navigation }) => {
     }
   };
 
-  // Hàm lưu trạng thái cấp học vào AsyncStorage
   const saveLevel = async () => {
     try {
       await AsyncStorage.setItem('currentLevel', currentLevel.toString());
@@ -68,15 +64,16 @@ const School = ({ navigation }) => {
     const updatedSchools = [...schools];
     updatedSchools[schoolIndex].completed[subjectIndex] = true;
 
-    // Kiểm tra xem cấp học hiện tại đã hoàn thành chưa
-    const isLevelCompleted = updatedSchools[currentLevel].subjects.every(
-      (_, index) => updatedSchools[currentLevel].completed[index]
+    const isLevelCompleted = updatedSchools[schoolIndex].subjects.every(
+      (_, index) => updatedSchools[schoolIndex].completed[index]
     );
 
-    // Nếu đã hoàn thành, chuyển sang cấp học tiếp theo
-    if (isLevelCompleted && currentLevel < schools.length - 1) {
-      setCurrentLevel(currentLevel + 1);
-      updatedSchools[currentLevel + 1].isCompleted = true;
+    if (isLevelCompleted) {
+      updatedSchools[schoolIndex].isCompleted = true;
+      if (schoolIndex < schools.length - 1) {
+        setCurrentLevel(schoolIndex + 1);
+        updatedSchools[schoolIndex + 1].isCompleted = true;
+      }
     }
 
     setSchools(updatedSchools);
@@ -87,7 +84,6 @@ const School = ({ navigation }) => {
       <Header text="School"/>
       <View style={styles.content}>
         {schools.map((school, schoolIndex) => (
-          // Hiển thị chỉ các cấp học đã hoàn thành hoặc cấp học hiện tại
           (school.isCompleted || schoolIndex === currentLevel) && (
             <View key={schoolIndex} style={styles.schoolContainer}>
               <Text style={styles.schoolName}>{school.name}</Text>
@@ -99,6 +95,7 @@ const School = ({ navigation }) => {
                     { backgroundColor: school.completed[subjectIndex] ? '#4CAF50' : '#3498db' }
                   ]}
                   onPress={() => handleSubjectPress(schoolIndex, subjectIndex)}
+                  disabled={school.completed[subjectIndex]}
                 >
                   <Text style={styles.subjectButtonText}>{subject}</Text>
                 </TouchableOpacity>
@@ -106,6 +103,9 @@ const School = ({ navigation }) => {
             </View>
           )
         ))}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Job', { currentLevel })}>
+          <Text style={styles.buttonText}>Check Job Opportunities</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -116,19 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ecf0f1',
   },
-  header: {
-    backgroundColor: '#34495e',
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerText: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   content: {
-    flex: 1,
     padding: 20,
   },
   schoolContainer: {
@@ -148,6 +136,17 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
   },
+  button: {
+    marginTop: 20,
+    backgroundColor: '#3498db',
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    textAlign: 'center',
+  }
 });
 
 export default School;

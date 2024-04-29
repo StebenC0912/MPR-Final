@@ -8,7 +8,7 @@ const Assert = ({ navigation }) => {
     <View style={styles.container}>
       <Header text="Assert"/>
       <View style={styles.content}>
-        <PrimaryButton onPress={() => navigation.navigate('Job')} text="Job"/>
+
         <PrimaryButton onPress={() => navigation.navigate('PartJob')} text="Part-Time Job"/>
       </View>
     </View>

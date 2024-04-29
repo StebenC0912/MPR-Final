@@ -11,7 +11,7 @@ const Activity = () => {
 
   const handleHospitalVisit = () => {
     modifyBankBalance(-500); // Subtract $500 from bank balance
-    modifyStats({ health: 20 }); // Increase health by 20%
+    modifyStats({ health: +20, smart: +0, look: +0, happy: +0 }); // Increase health by 20%
     Alert.alert(
       'Hospital Visit',
       'You have paid $500 and increased your health by 20%.',
@@ -21,16 +21,20 @@ const Activity = () => {
       { cancelable: false }
     );
   };
-
+  
   const handleShoppingPress = () => {
     navigation.navigate('Shop'); // Navigate to Shop screen
   };
-
+  const handleKill = () => {
+    modifyBankBalance(-500); // Subtract $500 from bank balance
+    modifyStats({ health: -100, smart: +0, look: +0, happy: +0 }); // Increase health by 20%
+  }
   return (
     <View style={styles.container}>
       <Header text="Activity"/>
       <View style={styles.content}>
         <PrimaryButton onPress={handleHospitalVisit} text="Hospital"/>
+        <PrimaryButton onPress={handleKill} text="Kill to test"/>
         <PrimaryButton onPress={handleShoppingPress} text="Shopping"/>
       </View>
     </View>

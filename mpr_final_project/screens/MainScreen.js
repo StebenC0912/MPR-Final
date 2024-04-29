@@ -65,11 +65,12 @@ const MainScreen = ({ navigation, route }) => {
 
   const handleIncreaseAge = () => {
     incrementAge(); // Directly increment age by 1 year
+    
     if (dataEventByAge.length !== 0) {
       // If there are events associated with the new age, add them to the dataEvent state
       setDataEvent((prevDataEvent) => [
         ...prevDataEvent,
-        { events: [chooseRandomEvent()], id: stats.age + 1 },
+        { events: [chooseRandomEvent()], id: stats.age + 1, },
       ]);
     }
   };
@@ -88,8 +89,23 @@ const MainScreen = ({ navigation, route }) => {
 
     return () => clearInterval(secondTimer); // Clean up the interval on component unmount
   }, [incrementAge]); // Include incrementAge in the dependency array
-
-
+  
+  useEffect(() => {
+    if (stats.health <= 0 || stats.happy <= 0) {
+      // Hiển thị cảnh báo hoặc thông báo về sự kết thúc của trò chơi
+      Alert.alert(
+        "Game Over",
+        "Your character has died due to " + (stats.health <= 0 ? "poor health." : "unhappiness."),
+        [
+          {
+            text: "View Score",
+            onPress: () => navigation.navigate('EndGame'), // Giả sử bạn đã thiết lập màn hình EndGame trong định tuyến của mình
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  }, [stats.health, stats.happy, navigation]);
   return (
     <View style={styles.container}>
       <View style={styles.header}>

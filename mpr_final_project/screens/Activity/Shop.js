@@ -10,30 +10,30 @@ const Shop = ({ navigation }) => {
     {
       name: "Car",
       effects: {
-        happy: 30,
-        health: 0,
-        smart: 0,
-        look: 20,
+        happy: +30,
+        health: +0,
+        smart: +0,
+        look: +20,
         cost: -250000
       }
     },
     {
       name: "Motorbike",
       effects: {
-        happy: 10,
-        health: 0,
-        smart: 0,
-        look: 10,
+        happy: +10,
+        health: +0,
+        smart: +0,
+        look: +10,
         cost: -100000
       }
     },
     {
       name: "Bike",
       effects: {
-        happy: 5,
-        health: 0,
-        smart: 0,
-        look: 5,
+        happy: +5,
+        health: +0,
+        smart: +0,
+        look: +5,
         cost: -50000
       }
     }

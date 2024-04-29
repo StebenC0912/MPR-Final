@@ -15,10 +15,11 @@ import School from './screens/School/School';
 import Relationship from './screens/Relationship/Relationship';
 import Assert from './screens/Assert/Assert';
 import Activity from './screens/Activity/Activity';
-import Subject from './screens/School/Subject';
 import PartJob from './screens/Assert/PartJob'
 import Job from './screens/Assert/Job';
 import Shop from './screens/Activity/Shop';
+import Interaction from './screens/Relationship/Interaction';
+import EndGame from './screens/EndGame';
 const Stack = createStackNavigator();
 
 
@@ -50,10 +51,11 @@ export default function App() {
             <Stack.Screen name="Activity" component={Activity} />
             <Stack.Screen name="Relationship" component={Relationship} />
             <Stack.Screen name="Assert" component={Assert} />
-            <Stack.Screen name="Subject" component={Subject}/>
             <Stack.Screen name="PartJob" component={PartJob}/>
             <Stack.Screen name="Job" component={Job}/>
             <Stack.Screen name="Shop" component={Shop}/>
+            <Stack.Screen name="Interaction" component={Interaction} />
+            <Stack.Screen name="EndGame" component={EndGame} />
             </Stack.Navigator>
       {/* </View> */}
     </NavigationContainer>

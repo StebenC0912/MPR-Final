@@ -17,7 +17,7 @@ const initialState = {
 const MODIFY_STATS = 'MODIFY_STATS';
 const UPDATE_BANK_BALANCE = 'UPDATE_BANK_BALANCE';
 const INCREMENT_AGE = 'INCREMENT_AGE';
-
+const APPLY_EVENT_EFFECT = 'APPLY_EVENT_EFFECT'; 
 // Reducer to handle actions
 function statReducer(state, action) {
   switch (action.type) {
@@ -34,11 +34,28 @@ function statReducer(state, action) {
         ...state,
         bankBalance: state.bankBalance + action.payload
       };
-    case INCREMENT_AGE:
-      return {
-        ...state,
-        age: state.age + 1
-      };
+      case INCREMENT_AGE:
+        let newAge = state.age + 1;
+        let newBankBalance = state.bankBalance;
+        if (newAge === 18) {
+          newBankBalance += 10000;  // Add $10,000 when age reaches 18
+        }
+        if (newAge > 40){
+          state.health = state.health -2;
+        }
+        return {
+          ...state,
+          age: newAge,
+          bankBalance: newBankBalance
+        };
+        case APPLY_EVENT_EFFECT:
+          return {
+              ...state,
+              happy: Math.max(0, state.happy + action.payload.happy),
+              health: Math.max(0, state.health + action.payload.health),
+              smart: Math.max(0, state.smart + action.payload.smart),
+              look: Math.max(0, state.look + action.payload.look)
+          };
     default:
       return state;
   }
@@ -61,13 +78,16 @@ export const StatProvider = ({ children }) => {
   const incrementAge = () => {
     dispatch({ type: INCREMENT_AGE });
   };
-
+  const applyEventEffect = (effects) => {
+    dispatch({ type: APPLY_EVENT_EFFECT, payload: effects });
+};
   return (
     <StatContext.Provider value={{
       stats: state,
       modifyStats,
       modifyBankBalance,
-      incrementAge
+      incrementAge,
+      applyEventEffect
     }}>
       {children}
     </StatContext.Provider>
