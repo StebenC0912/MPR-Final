@@ -14,9 +14,9 @@ const Relationship = () => {
   ]);
 
   const [friends, setFriends] = useState([
-    { id: 1, name: 'Phuc' },
-    { id: 2, name: 'Hien' },
-    { id: 3, name: 'Lee' },
+    { id: 4, name: 'Phuc' },
+    { id: 5, name: 'Hien' },
+    { id: 6, name: 'Lee' },
   ]);
 
   const handleInteraction = (person) => {

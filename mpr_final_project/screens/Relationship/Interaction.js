@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import Header from '../../components/layout/Header';
 import PrimaryButton from '../../components/ui/PrimaryButton';
+import { useNavigation } from '@react-navigation/native';
 
-const Interaction = ({ route, navigation }) => {
+const Interaction = ({ route }) => {
   const { person } = route.params;
+  const navigation = useNavigation();
 
   const interactions = [
     { id: 1, name: 'Send message' },
@@ -14,7 +16,8 @@ const Interaction = ({ route, navigation }) => {
   const handleInteraction = (interaction) => {
     switch (interaction) {
       case 'Send message':
-        alert(`Sending message to ${person.name}`);
+        // alert(`Sending message to ${person.name}`);
+        navigation.navigate('MessagingScreen', {person})
         break;
       case 'Send gift':
         alert(`Sending gift to ${person.name}`);
