@@ -7,34 +7,49 @@ import PrimaryButton from '../../components/ui/PrimaryButton';
 
 const Activity = () => {
   const { modifyStats, modifyBankBalance } = useStats();
-  const navigation = useNavigation(); // Use the navigation hook
+  const navigation = useNavigation();
 
   const handleHospitalVisit = () => {
-    modifyBankBalance(-500); // Subtract $500 from bank balance
-    modifyStats({ health: +20, smart: +0, look: +0, happy: +0 }); // Increase health by 20%
-    Alert.alert(
-      'Hospital Visit',
-      'You have paid $500 and increased your health by 20%.',
-      [
-        { text: 'OK', onPress: () => console.log('OK Pressed') }
-      ],
-      { cancelable: false }
-    );
+    modifyBankBalance(-50000); // Subtract $500 from bank balance
+    modifyStats({ health: +50, happy: 0, smart: 0, look: 0 }); // Increase health by 20%
+    Alert.alert('Hospital Visit', 'You have paid $50000  and increased your health by 20%.');
   };
-  
+
+
+const handleExercise = () => {
+    modifyStats({ health: +10, happy: +5, look: +2, smart: 0 }); // Exercise affects health, happiness, and looks
+    Alert.alert('Exercise', 'You feel healthier, happier, and more attractive!');
+};
+
+const handleMeditate = () => {
+    modifyStats({ happy: +15, health: +5, smart: 0, look: 0 }); // Meditation increases happiness and health
+    Alert.alert('Meditate', 'You feel more at peace and slightly healthier.');
+};
+
+const handleGoTraveling = () => {
+    modifyBankBalance(-20000); // Traveling costs $20,000
+    modifyStats({ happy: +20, health: -5, smart: 0, look: 0 }); // Traveling increases happiness but can be tiring
+    Alert.alert('Go Traveling', 'You spent $20,000 but had a great time!');
+};
+
+const handlePlayingVideoGames = () => {
+    modifyStats({ happy: +5, smart: -2, health: 0, look: 0 }); // Video games increase happiness but decrease smarts
+    Alert.alert('Playing Video Games', 'You had fun playing video games, but maybe it was too much screen time.');
+};
   const handleShoppingPress = () => {
-    navigation.navigate('Shop'); // Navigate to Shop screen
+    navigation.navigate('Shop');
   };
-  const handleKill = () => {
-    modifyBankBalance(-500); // Subtract $500 from bank balance
-    modifyStats({ health: -100, smart: +0, look: +0, happy: +0 }); // Increase health by 20%
-  }
+
+  
   return (
     <View style={styles.container}>
       <Header text="Activity"/>
       <View style={styles.content}>
         <PrimaryButton onPress={handleHospitalVisit} text="Hospital"/>
-        <PrimaryButton onPress={handleKill} text="Kill to test"/>
+        <PrimaryButton onPress={handleExercise} text="Exercise"/>
+        <PrimaryButton onPress={handleMeditate} text="Meditate"/>
+        <PrimaryButton onPress={handleGoTraveling} text="Go Traveling"/>
+        <PrimaryButton onPress={handlePlayingVideoGames} text="Play Video Games"/>
         <PrimaryButton onPress={handleShoppingPress} text="Shopping"/>
       </View>
     </View>

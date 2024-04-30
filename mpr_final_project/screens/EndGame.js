@@ -6,20 +6,52 @@ const EndGame = ({ navigation }) => {
   const { stats } = useStats();
 
   const handleRestart = () => {
-    navigation.navigate('Intro'); // Ensure this navigates to your start or intro screen
+    navigation.navigate('Intro'); // Đảm bảo rằng điều này chuyển hướng đến màn hình bắt đầu hoặc giới thiệu của bạn
   };
+
+  // Kiểm tra điều kiện chết
+  const isDead = stats.happy <= 0 || stats.health <= 0 || stats.bankBalance < -10000;
+
+  // Tạo biến để lưu thông điệp chết
+  let deathMessage = '';
+
+  // Xác định nguyên nhân của cái chết
+  if (stats.happy <= 0) {
+    deathMessage = 'extreme unhappiness';
+  } else if (stats.health <= 0) {
+    deathMessage = 'poor health';
+  } else if (stats.bankBalance < -10000) {
+    deathMessage = 'overwhelming debt';
+  }
 
   return (
     <View style={styles.container}>
       <Image
-            source={require("./../assets/images/grave.png")}
-            style={styles.image}
-          />
+        source={require("./../assets/images/grave.png")}
+        style={styles.image}
+      />
       <Text style={styles.header}>Game Over</Text>
-      <Text style={styles.message}>Your journey ends here...</Text>
-      <Text style={styles.score}>Final Score: {stats.bankBalance}</Text>
-      <Text style={styles.cause}>Cause of Death: {stats.health <= 0 ? 'Unhealthy' : 'Unhappy'}</Text>
-      <Button title="Start New Game" onPress={handleRestart} color="#1E90FF" />
+      {isDead ? (
+        <>
+          <Text style={styles.message}>Your journey ends here at age {stats.age}...</Text>
+          <Text style={styles.details}>
+            Your final moments were marked by {deathMessage}.
+          </Text>
+          <Text style={styles.stats}>
+            Final Stats -{"\n"}
+            - Health: {stats.health},{"\n"}
+            - Happiness: {stats.happy},{"\n"}
+            - Smarts: {stats.smart},{"\n"}
+            - Looks: {stats.look}
+          </Text>
+          <Text style={styles.score}>
+            Final Bank Balance: ${stats.bankBalance}
+          </Text>
+          <Button title="Start New Game" onPress={handleRestart} color="#1E90FF" />
+        </>
+      ) : (
+        <Text style={styles.message}>Congratulations! You have survived!</Text>
+      )}
     </View>
   );
 };
@@ -40,22 +72,27 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFD700', // Golden color for emphasis
+    color: '#FFD700', // Màu vàng để nhấn mạnh
     marginBottom: 10
   },
   message: {
     fontSize: 20,
     color: '#FFF',
-    marginBottom: 20
+    marginBottom: 10
+  },
+  details: {
+    fontSize: 18,
+    color: '#FFF',
+    marginBottom: 5
+  },
+  stats: {
+    fontSize: 16,
+    color: '#ADFF2F', // Màu xanh vàng để hiển thị thông tin chỉ số
+    marginBottom: 5
   },
   score: {
     fontSize: 18,
-    color: '#ADFF2F', // Green-yellow for a vibrant look
-    marginBottom: 5
-  },
-  cause: {
-    fontSize: 16,
-    color: '#FF6347', // Tomato color to highlight the cause of death
+    color: '#FF6347', // Màu cà chua để làm nổi bật tình trạng tài chính
     marginBottom: 20
   }
 });

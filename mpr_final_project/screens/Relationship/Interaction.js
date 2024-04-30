@@ -1,44 +1,67 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Alert, StyleSheet, FlatList } from 'react-native';
 import Header from '../../components/layout/Header';
 import PrimaryButton from '../../components/ui/PrimaryButton';
 import { useNavigation } from '@react-navigation/native';
+import { useStats } from '../../store/StatContext'; // Make sure this path is correct
 
 const Interaction = ({ route }) => {
-  const { person } = route.params;
   const navigation = useNavigation();
+  const { person } = route.params;
+  const { modifyStats, modifyBankBalance } = useStats(); // Moved inside the component
 
   const interactions = [
     { id: 1, name: 'Send message' },
     { id: 2, name: 'Send gift' },
+    { id: 3, name: 'Ask for advice' },
+    { id: 4, name: 'Go on a date' },
+    { id: 5, name: 'Invite to event' },
+    { id: 6, name: 'Help with a problem' },
   ];
 
   const handleInteraction = (interaction) => {
     switch (interaction) {
       case 'Send message':
-        // alert(`Sending message to ${person.name}`);
-        navigation.navigate('MessagingScreen', {person})
+        navigation.navigate('MessagingScreen', { person });
         break;
-      case 'Send gift':
-        alert(`Sending gift to ${person.name}`);
-        break;
-      default:
-        break;
-    }
+        case 'Send gift':
+      modifyBankBalance(-100);
+      modifyStats({ happy: +10, health: 0, smart: 0, look: 0 });
+      Alert.alert('Send Gift', `You sent a gift to ${person.name} and spent $100.`);
+      break;
+    case 'Ask for advice':
+      modifyStats({ happy: +5, health: 0, smart: +5, look: 0 });
+      Alert.alert('Ask for Advice', `You asked ${person.name} for advice, gaining knowledge and happiness.`);
+      break;
+    case 'Go on a date':
+      modifyBankBalance(-200);
+      modifyStats({ happy: +20, health: 0, smart: 0, look: 0 });
+      Alert.alert('Go on a Date', `You went on a date with ${person.name} and spent $200. It was fun!`);
+      break;
+    case 'Invite to event':
+      modifyBankBalance(-150);
+      modifyStats({ happy: +15, health: 0, smart: 0, look: 0 });
+      Alert.alert('Invite to Event', `You invited ${person.name} to an event and spent $150.`);
+      break;
+    case 'Help with a problem':
+      modifyStats({ happy: +10, smart: +10, health: +5, look: 0 });
+      Alert.alert('Help with a Problem', `You helped ${person.name} solve a problem, improving happiness, smarts, and health.`);
+      break;
+    default:
+      Alert.alert('Unknown Interaction', 'This interaction is not recognized.');
+      break;
+  }
   };
 
   const renderItem = ({ item }) => (
-    // <TouchableOpacity onPress={() => handleInteraction(item.name)} style={styles.interaction}>
-    //   <Text>{item.name}</Text>
-    // </TouchableOpacity>
     <PrimaryButton text={item.name} onPress={() => handleInteraction(item.name)} />
   );
 
-  const text = `Interactions with ${person.name}`
+  const text = `Interactions with ${person.name}`;
 
   return (
     <View style={styles.container}>
-      <Header text={text}/>
+      <Header text={text} />
       <View style={styles.lists}>
         <FlatList
           data={interactions}
@@ -50,6 +73,7 @@ const Interaction = ({ route }) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

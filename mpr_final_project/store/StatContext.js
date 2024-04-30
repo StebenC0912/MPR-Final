@@ -5,8 +5,8 @@ const StatContext = createContext();
 
 // Initial state for the stats
 const initialState = {
-  happy: 100,
-  health: 100,
+  happy: 55,
+  health: 50,
   smart: 30,
   look: 20,
   bankBalance: 0,

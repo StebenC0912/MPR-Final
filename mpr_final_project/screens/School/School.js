@@ -6,6 +6,7 @@ import Header from '../../components/layout/Header';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const School = ({ navigation }) => {
+  const { stats, incrementAge } = useStats();
   const [currentLevel, setCurrentLevel] = useState(0);
   const [schools, setSchools] = useState([
     {
@@ -89,6 +90,7 @@ const School = ({ navigation }) => {
     }
 
     setSchools(updatedSchools);
+    incrementAge();
   };
 
   return (
