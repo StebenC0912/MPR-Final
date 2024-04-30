@@ -56,7 +56,7 @@ const CreateCharacter = ({ navigation, route }) => {
     };
 
     fetchCharacter();
-  }, [uid]);
+  }, [uid, db]);
 
   console.log("Character:", character);
   // Initialize Firestore
@@ -79,7 +79,17 @@ const CreateCharacter = ({ navigation, route }) => {
           uid: uid,
         });
         console.log("Document written with ID: ", docRef.id);
-        navigation.navigate("Main", { name: name, id: uid }); // Navigate after saving
+        const eventsDocRef = await addDoc(collection(db, "events"), {
+          id: uid,
+          events: [],
+        });
+        console.log("Events document written with ID: ", eventsDocRef.id);
+
+        navigation.navigate("Main", {
+          name: name,
+          id: uid,
+          eventId: eventsDocRef.id,
+        }); // Navigate after saving
       } catch (error) {
         console.error("Error writing document: ", error);
         Alert.alert("Error", "Unable to create character.");
@@ -102,12 +112,31 @@ const CreateCharacter = ({ navigation, route }) => {
           uid: uid,
         });
         console.log("Document written with ID: ", docRef.id);
-        navigation.navigate("Main", { name: name, id: uid }); // Navigate after saving
+        const doc = await addDoc(collection(db, "events"), {
+          id: uid,
+          events: [],
+        });
+        navigation.navigate("Main", {
+          name: name,
+          id: uid,
+          eventId: doc.id,
+        }); // Navigate after saving
       } catch (error) {
         console.error("Error deleting character:", error.message);
       }
     } else {
-      navigation.navigate("Main", { name: name, id: uid }); // Navigate after saving
+      const querySnapshot = await getDocs(collection(db, "events"));
+      querySnapshot.forEach((doc) => {
+        const characterData = doc.data();
+        // Check if the UID in the document matches the current user's UID
+        if (characterData.id === uid) {
+          navigation.navigate("Main", {
+            name: name,
+            id: uid,
+            eventId: doc.id,
+          });
+        }
+      });
     }
   };
 

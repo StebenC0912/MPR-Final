@@ -1,12 +1,34 @@
 import React from 'react';
 import { useStats } from '../store/StatContext';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
-
-const EndGame = ({ navigation }) => {
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
+const EndGame = ({ navigation , route }) => {
   const { stats } = useStats();
 
-  const handleRestart = () => {
-    navigation.navigate('Intro'); // Đảm bảo rằng điều này chuyển hướng đến màn hình bắt đầu hoặc giới thiệu của bạn
+  const db = getFirestore();
+  const { uid } = route.params;
+
+  const handleRestart = async () => {
+    // Delete the character from Firestore
+    try {
+      const querySnapshot = await getDocs(collection(db, "characters"));
+      querySnapshot.forEach((doc) => {
+        const characterData = doc.data();
+        // Check if the UID in the document matches the current user's UID
+        if (characterData.uid === uid) {
+          deleteDoc(doc.ref);
+        }
+      });
+      console.log("Character deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting character:", error.message);
+    }
+    navigation.navigate('Intro'); // Ensure this navigates to your start or intro screen
   };
 
   // Kiểm tra điều kiện chết

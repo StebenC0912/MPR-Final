@@ -1,39 +1,48 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, StyleSheet, Image, Alert, FlatList, Button} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Alert,
+  FlatList,
+  Button,
+} from "react-native";
 import { useStats } from "../store/StatContext";
 import { starterPack, randomEvent } from "../data/test";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import ProgressBar from "../components/layout/ProgressBar";
 import NavigationButton from "../components/ui/NavigationButton";
 import StatContent from "../components/layout/StatContent";
 import { color } from "../constants/color";
 import DailyLogin from "./DailyLogin";
 
-
 const MainScreen = ({ navigation, route }) => {
   const [dataEvent, setDataEvent] = useState([]);
   const [progress, setProgress] = useState(0);
-  const [showSchoolAndRelationship, setShowSchoolAndRelationship] = useState(false);
+  const [showSchoolAndRelationship, setShowSchoolAndRelationship] =
+    useState(false);
   const [showRemaining, setShowRemaining] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [events, setEvents] = useState([]);
+  const uid = route.params.id;
+  const eventId = route.params.eventId;
+  const db = getFirestore();
 
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
-  
-  useEffect(() => {
-    let newDataEvent = [];
-    starterPack.forEach((event) => {
-      const age = event.age;
-      const index = newDataEvent.findIndex((element) => element.id === age);
-      if (index === -1) {
-        newDataEvent.push({ id: age, events: [event] });
-      } else {
-        newDataEvent[index].events.push(event);
-      }
-    });
-    setDataEvent(newDataEvent);
-  }, []);
 
-  const { stats, incrementAge, dispatch} = useStats();
+ 
+
+  const { stats, incrementAge, dispatch } = useStats();
   const { name } = route.params;
 
   useEffect(() => {
@@ -50,11 +59,9 @@ const MainScreen = ({ navigation, route }) => {
         "Assert and Activity features are now unlocked!",
         [{ text: "OK", onPress: () => setShowRemaining(true) }]
       );
-      Alert.alert(
-        "Check your bank balance",
-        "Your parents give you $10,000!",
-        [{ text: "OK", onPress: () => setShowRemaining(true) }]
-      );
+      Alert.alert("Check your bank balance", "Your parents give you $10,000!", [
+        { text: "OK", onPress: () => setShowRemaining(true) },
+      ]);
     }
   }, [stats.age]);
 
@@ -72,26 +79,31 @@ const MainScreen = ({ navigation, route }) => {
     const randomIndex = Math.floor(Math.random() * dataEventByAge.length);
     return dataEventByAge[randomIndex];
   };
-  const event = chooseRandomEvent(); 
-  const handleIncreaseAge = () => {
+  const event = chooseRandomEvent();
+  const handleIncreaseAge = async () => {
     incrementAge(); // Ensure this function is compatible with your state management
     const event = chooseRandomEvent();
     if (event) {
-        dispatch({
-            type: 'MODIFY_STATS',
-            payload: event.effects
-        });
-        setDataEvent(prevDataEvent => [
-            ...prevDataEvent,
-            { events: [event], id: stats.age + 1 }
-        ]);
+      dispatch({
+        type: "MODIFY_STATS",
+        payload: event.effects,
+      });
+      setDataEvent((prevDataEvent) => [
+        ...prevDataEvent,
+        { events: [event], id: stats.age + 1 },
+      ]);
     }
-  }
+    setEvents((prevEvents) => [...prevEvents, event.id]);
+    await updateDoc(doc(db, "events", eventId), {
+      events: events, // Update with the new dataEvent
+    });
+    console.log("Document updated successfully");
+  };
 
   useEffect(() => {
     const secondTimer = setInterval(() => {
-      setProgress(prevProgress => {
-        const newProgress = prevProgress + 100 /(12* 60); // Increment by the fraction per second
+      setProgress((prevProgress) => {
+        const newProgress = prevProgress + 100 / (12 * 60); // Increment by the fraction per second
         if (newProgress >= 100) {
           incrementAge(); // Use incrementAge from context to update age
           return 0; // Reset progress
@@ -102,23 +114,87 @@ const MainScreen = ({ navigation, route }) => {
 
     return () => clearInterval(secondTimer); // Clean up the interval on component unmount
   }, [incrementAge]); // Include incrementAge in the dependency array
-  
+
   useEffect(() => {
     if (stats.health <= 0 || stats.happy <= 0) {
       // Hiển thị cảnh báo hoặc thông báo về sự kết thúc của trò chơi
       Alert.alert(
         "Game Over",
-        "Your character has died due to " + (stats.health <= 0 ? "poor health." : "unhappiness."),
+        "Your character has died due to " +
+          (stats.health <= 0 ? "poor health." : "unhappiness."),
         [
           {
             text: "View Score",
-            onPress: () => navigation.navigate('EndGame'), // Giả sử bạn đã thiết lập màn hình EndGame trong định tuyến của mình
+            onPress: () => navigation.navigate("EndGame"), // Giả sử bạn đã thiết lập màn hình EndGame trong định tuyến của mình
           },
         ],
         { cancelable: false }
       );
     }
   }, [stats.health, stats.happy, navigation]);
+  useEffect(() => {
+    const fetchData = async () => {
+      // Initialize newDataEvent array
+      let newDataEvent = [];
+
+      // Populate newDataEvent with starterPack events grouped by age
+      starterPack.forEach((event) => {
+        const age = event.age;
+        const index = newDataEvent.findIndex((element) => element.id === age);
+        if (index === -1) {
+          newDataEvent.push({ id: age, events: [event] });
+        } else {
+          newDataEvent[index].events.push(event);
+        }
+      });
+
+      // Set initial dataEvent state with newDataEvent
+      setDataEvent(newDataEvent);
+
+      // Fetch events from Firestore
+      const docRef = doc(db, "events", eventId);
+
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+
+        console.log("Document data:", data.events);
+        setEvents(data.events);
+        console.log("Events", data.events);
+        // Increment age for each event fetched
+        for (const index of data.events) {
+          incrementAge();
+
+          // Retrieve current event from randomEvent based on index
+          const eventCurrent = randomEvent.find((event) => event.id === index);
+          const age = eventCurrent.age;
+
+          // Update newDataEvent with new event
+          const i = newDataEvent.findIndex((element) => element.id === age);
+          if (i === -1) {
+            newDataEvent.push({ id: age, events: [eventCurrent] });
+          } else {
+            newDataEvent[i].events.push(eventCurrent);
+          }
+
+          // Dispatch event effects to modify stats
+          dispatch({
+            type: "MODIFY_STATS",
+            payload: eventCurrent.effects,
+          });
+        }
+        console.log("DataEvent", newDataEvent);
+
+        console.log("DataEvent", newDataEvent);
+      } else {
+        console.log("No such document!");
+      }
+    };
+
+    console.log("Fetching data...");
+    fetchData(); // Call the async function
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -136,12 +212,9 @@ const MainScreen = ({ navigation, route }) => {
           <Text style={styles.age}>Age: {stats.age}</Text>
         </View>
         <View style={styles.bankBalance}>
-          <Text>
-            Bank Balance: ${stats.bankBalance}
-          </Text>
-          <DailyLogin/>
+          <Text>Bank Balance: ${stats.bankBalance}</Text>
+          <DailyLogin />
         </View>
-        
       </View>
       <View style={styles.detailsSection}>
         <FlatList
@@ -163,7 +236,7 @@ const MainScreen = ({ navigation, route }) => {
         <ProgressBar progress={progress} color={color.colors.blue} />
       </View>
       <View style={styles.statsSection}>
-        <StatContent 
+        <StatContent
           color={color.colors.yellow}
           label="Happy"
           progress={stats.happy}
@@ -171,7 +244,7 @@ const MainScreen = ({ navigation, route }) => {
           iconSize={20}
           iconColor={color.colors.darkYellow}
         />
-        <StatContent 
+        <StatContent
           color={color.colors.green}
           label="Health"
           progress={stats.health}
@@ -179,7 +252,7 @@ const MainScreen = ({ navigation, route }) => {
           iconSize={20}
           iconColor={color.colors.red}
         />
-        <StatContent 
+        <StatContent
           color={color.colors.blue}
           label="Smart"
           progress={stats.smart}
@@ -187,7 +260,7 @@ const MainScreen = ({ navigation, route }) => {
           iconSize={20}
           iconColor={color.colors.blue}
         />
-        <StatContent 
+        <StatContent
           color={color.colors.pink}
           label="Looks"
           progress={stats.look}
@@ -211,11 +284,7 @@ const MainScreen = ({ navigation, route }) => {
             />
           </>
         )}
-        <NavigationButton
-          icon="plus"
-          text="Age"
-          onPress={handleIncreaseAge}
-        />
+        <NavigationButton icon="plus" text="Age" onPress={handleIncreaseAge} />
         {showRemaining && (
           <>
             <NavigationButton
@@ -291,9 +360,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   timeBarContainer: {
-    height: 20, 
-    width: "100%", 
-    backgroundColor: "#ddd", 
+    height: 20,
+    width: "100%",
+    backgroundColor: "#ddd",
   },
   statsSection: {
     paddingVertical: 10,
