@@ -38,19 +38,19 @@ const DailyLogin = () => {
                         color='#FFE9B8'
                         day='Day 1 (Sun)'
                         money='100$'
-                        onPress={() => handleReceiveReward(0, 10)}
+                        onPress={() => handleReceiveReward(0, 100)}
                     />
                     <LoginGift 
                         color="#A7CA57"
                         day='Day 2 (Mon)'
                         money='200$'
-                        onPress={() => handleReceiveReward(1, 20)}
+                        onPress={() => handleReceiveReward(1, 200)}
                     />
                     <LoginGift 
                         color="#F8C748"
                         day='Day 3 (Tue)'
                         money='300$'
-                        onPress={() => handleReceiveReward(2, 30)}
+                        onPress={() => handleReceiveReward(2, 300)}
                     />
                 </View>
                 <View style={styles.line2}>
@@ -58,23 +58,23 @@ const DailyLogin = () => {
                         color="#A3A8FF"
                         day='Day 4 (Wed)'
                         money='400$'
-                        onPress={() => handleReceiveReward(3, 40)}
+                        onPress={() => handleReceiveReward(3, 400)}
                     />
                     <LoginGift 
                         color="#C6E9ED"
                         day='Day 5 (Thu)'
                         money='500$'
-                        onPress={() => handleReceiveReward(4, 50)}
+                        onPress={() => handleReceiveReward(4, 500)}
                     />
                     <LoginGift 
                         color='#FF889E'
                         day='Day 6 (Fri)'
                         money='600$'
-                        onPress={() => handleReceiveReward(5, 60)}
+                        onPress={() => handleReceiveReward(5, 600)}
                     />
                 </View>
-                <TouchableOpacity style={styles.bigGift} onPress={() => handleReceiveReward(6, 100)}>
-                    <Text style={{ fontFamily: 'OrelegaOne', fontSize: 18 }}>Day 7 (Sat) - 100$</Text>
+                <TouchableOpacity style={styles.bigGift} onPress={() => handleReceiveReward(6, 1000)}>
+                    <Text style={{ fontFamily: 'OrelegaOne', fontSize: 18 }}>Day 7 (Sat) - 1000$</Text>
                     <Image
                         source={require('./../assets/images/big-gift.png')}
                         style={{ height: 40, width: 40 }}
