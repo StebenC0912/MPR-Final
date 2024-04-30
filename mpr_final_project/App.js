@@ -19,6 +19,7 @@ import Job from './screens/Assert/Job';
 import Shop from './screens/Activity/Shop';
 import Interaction from './screens/Relationship/Interaction';
 import EndGame from './screens/EndGame';
+import MessagingScreen from './screens/Relationship/MessagingScreen';
 
 const Stack = createStackNavigator();
 
@@ -55,6 +56,7 @@ export default function App() {
             <Stack.Screen name="Job" component={Job}/>
             <Stack.Screen name="Shop" component={Shop}/>
             <Stack.Screen name="Interaction" component={Interaction} />
+            <Stack.Screen name='MessagingScreen' component={MessagingScreen}/>
             <Stack.Screen name="EndGame" component={EndGame} />
             </Stack.Navigator>
       {/* </View> */}
