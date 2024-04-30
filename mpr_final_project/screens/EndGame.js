@@ -6,6 +6,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  doc,
 } from "firebase/firestore";
 const EndGame = ({ navigation, route }) => {
   const { stats } = useStats();
@@ -26,11 +27,17 @@ const EndGame = ({ navigation, route }) => {
       });
       console.log("Character deleted successfully!");
       const docSnap = await getDocs(collection(db, "events"));
+
       docSnap.forEach((doc) => {
-        if (characterData.uid === uid) {
+        
+
+        const eventData = doc.data();
+        if (eventData.id === uid) {
+          console.log(doc.id, "=>", doc.data());
           deleteDoc(doc.ref);
         }
       });
+      console.log("Events deleted successfully!");
     } catch (error) {
       console.error("Error deleting character:", error.message);
     }
