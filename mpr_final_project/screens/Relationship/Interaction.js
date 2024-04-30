@@ -1,20 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import Header from '../../components/layout/Header';
+import PrimaryButton from '../../components/ui/PrimaryButton';
 
 const Interaction = ({ route, navigation }) => {
-  // Lấy thông tin về người được chọn từ route.params
   const { person } = route.params;
 
-  // Danh sách các lựa chọn tương tác
   const interactions = [
     { id: 1, name: 'Send message' },
     { id: 2, name: 'Send gift' },
-    // Thêm các lựa chọn tương tác khác nếu cần
   ];
 
-  // Hàm xử lý khi người dùng chọn một tùy chọn tương tác
   const handleInteraction = (interaction) => {
-    // Xử lý tùy chọn tương tác ở đây
     switch (interaction) {
       case 'Send message':
         alert(`Sending message to ${person.name}`);
@@ -22,28 +19,31 @@ const Interaction = ({ route, navigation }) => {
       case 'Send gift':
         alert(`Sending gift to ${person.name}`);
         break;
-      // Thêm các tùy chọn tương tác khác ở đây
       default:
         break;
     }
   };
 
-  // Render mỗi mục trong danh sách tương tác
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleInteraction(item.name)} style={styles.interaction}>
-      <Text>{item.name}</Text>
-    </TouchableOpacity>
+    // <TouchableOpacity onPress={() => handleInteraction(item.name)} style={styles.interaction}>
+    //   <Text>{item.name}</Text>
+    // </TouchableOpacity>
+    <PrimaryButton text={item.name} onPress={() => handleInteraction(item.name)} />
   );
+
+  const text = `Interactions with ${person.name}`
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Interactions with {person.name}</Text>
-      <FlatList
-        data={interactions}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        style={styles.list}
-      />
+      <Header text={text}/>
+      <View style={styles.lists}>
+        <FlatList
+          data={interactions}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          style={styles.list}
+        />
+      </View>
     </View>
   );
 };
@@ -51,16 +51,17 @@ const Interaction = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  list: {
-    width: '80%',
+  lists: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20
   },
   interaction: {
     padding: 10,
@@ -69,6 +70,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
   },
+  list: {
+    width: 300
+  }
 });
 
 export default Interaction;
