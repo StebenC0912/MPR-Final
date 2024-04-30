@@ -26,7 +26,8 @@ export default function App() {
   const [fontsLoaded, fontError] = useFonts({
     'Meddon': require('./assets/fonts/Meddon-Regular.ttf'),
     'ChelseaMarket': require('./assets/fonts/ChelseaMarket-Regular.ttf'),
-    'OrelegaOne': require('./assets/fonts/OrelegaOne-Regular.ttf')
+    'OrelegaOne': require('./assets/fonts/OrelegaOne-Regular.ttf'),
+    'Alfa': require('./assets/fonts/AlfaSlabOne-Regular.ttf')
   });
 
   const onLayoutRootView = useCallback(async () => {

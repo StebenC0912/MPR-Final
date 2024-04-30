@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, StyleSheet, Image, Alert, FlatList} from "react-native";
+import { View, Text, StyleSheet, Image, Alert, FlatList, Button} from "react-native";
 import { useStats } from "../store/StatContext";
 import { starterPack, randomEvent } from "../data/test";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc } from "firebase/firestore";
@@ -7,7 +7,7 @@ import ProgressBar from "../components/layout/ProgressBar";
 import NavigationButton from "../components/ui/NavigationButton";
 import StatContent from "../components/layout/StatContent";
 import { color } from "../constants/color";
-
+import DailyLogin from "./DailyLogin";
 
 
 const MainScreen = ({ navigation, route }) => {
@@ -15,7 +15,9 @@ const MainScreen = ({ navigation, route }) => {
   const [progress, setProgress] = useState(0);
   const [showSchoolAndRelationship, setShowSchoolAndRelationship] = useState(false);
   const [showRemaining, setShowRemaining] = useState(false);
- 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleModal = () => setIsModalVisible(() => !isModalVisible);
   
   useEffect(() => {
     let newDataEvent = [];
@@ -133,10 +135,13 @@ const MainScreen = ({ navigation, route }) => {
           <Text style={styles.profileName}>{name}</Text>
           <Text style={styles.age}>Age: {stats.age}</Text>
         </View>
-
-        <Text style={styles.bankBalance}>
-          Bank Balance: ${stats.bankBalance}
-        </Text>
+        <View style={styles.bankBalance}>
+          <Text>
+            Bank Balance: ${stats.bankBalance}
+          </Text>
+          <DailyLogin/>
+        </View>
+        
       </View>
       <View style={styles.detailsSection}>
         <FlatList
