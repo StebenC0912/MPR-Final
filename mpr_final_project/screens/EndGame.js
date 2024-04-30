@@ -1,13 +1,13 @@
-import React from 'react';
-import { useStats } from '../store/StatContext';
-import { View, Text, StyleSheet, Button, Image } from 'react-native';
+import React from "react";
+import { useStats } from "../store/StatContext";
+import { View, Text, StyleSheet, Button, Image } from "react-native";
 import {
   getFirestore,
   collection,
   getDocs,
   deleteDoc,
 } from "firebase/firestore";
-const EndGame = ({ navigation , route }) => {
+const EndGame = ({ navigation, route }) => {
   const { stats } = useStats();
 
   const db = getFirestore();
@@ -25,25 +25,32 @@ const EndGame = ({ navigation , route }) => {
         }
       });
       console.log("Character deleted successfully!");
+      const docSnap = await getDocs(collection(db, "events"));
+      docSnap.forEach((doc) => {
+        if (characterData.uid === uid) {
+          deleteDoc(doc.ref);
+        }
+      });
     } catch (error) {
       console.error("Error deleting character:", error.message);
     }
-    navigation.navigate('Intro'); // Ensure this navigates to your start or intro screen
+    navigation.navigate("Intro"); // Ensure this navigates to your start or intro screen
   };
 
   // Kiểm tra điều kiện chết
-  const isDead = stats.happy <= 0 || stats.health <= 0 || stats.bankBalance < -10000;
+  const isDead =
+    stats.happy <= 0 || stats.health <= 0 || stats.bankBalance < -10000;
 
   // Tạo biến để lưu thông điệp chết
-  let deathMessage = '';
+  let deathMessage = "";
 
   // Xác định nguyên nhân của cái chết
   if (stats.happy <= 0) {
-    deathMessage = 'extreme unhappiness';
+    deathMessage = "extreme unhappiness";
   } else if (stats.health <= 0) {
-    deathMessage = 'poor health';
+    deathMessage = "poor health";
   } else if (stats.bankBalance < -10000) {
-    deathMessage = 'overwhelming debt';
+    deathMessage = "overwhelming debt";
   }
 
   return (
@@ -55,21 +62,25 @@ const EndGame = ({ navigation , route }) => {
       <Text style={styles.header}>Game Over</Text>
       {isDead ? (
         <>
-          <Text style={styles.message}>Your journey ends here at age {stats.age}...</Text>
+          <Text style={styles.message}>
+            Your journey ends here at age {stats.age}...
+          </Text>
           <Text style={styles.details}>
             Your final moments were marked by {deathMessage}.
           </Text>
           <Text style={styles.stats}>
-            Final Stats -{"\n"}
-            - Health: {stats.health},{"\n"}
-            - Happiness: {stats.happy},{"\n"}
-            - Smarts: {stats.smart},{"\n"}
-            - Looks: {stats.look}
+            Final Stats -{"\n"}- Health: {stats.health},{"\n"}- Happiness:{" "}
+            {stats.happy},{"\n"}- Smarts: {stats.smart},{"\n"}- Looks:{" "}
+            {stats.look}
           </Text>
           <Text style={styles.score}>
             Final Bank Balance: ${stats.bankBalance}
           </Text>
-          <Button title="Start New Game" onPress={handleRestart} color="#1E90FF" />
+          <Button
+            title="Start New Game"
+            onPress={handleRestart}
+            color="#1E90FF"
+          />
         </>
       ) : (
         <Text style={styles.message}>Congratulations! You have survived!</Text>
@@ -81,10 +92,10 @@ const EndGame = ({ navigation , route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: '#282c34',
+    backgroundColor: "#282c34",
   },
   image: {
     width: 300,
@@ -93,30 +104,30 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFD700', // Màu vàng để nhấn mạnh
-    marginBottom: 10
+    fontWeight: "bold",
+    color: "#FFD700", // Màu vàng để nhấn mạnh
+    marginBottom: 10,
   },
   message: {
     fontSize: 20,
-    color: '#FFF',
-    marginBottom: 10
+    color: "#FFF",
+    marginBottom: 10,
   },
   details: {
     fontSize: 18,
-    color: '#FFF',
-    marginBottom: 5
+    color: "#FFF",
+    marginBottom: 5,
   },
   stats: {
     fontSize: 16,
-    color: '#ADFF2F', // Màu xanh vàng để hiển thị thông tin chỉ số
-    marginBottom: 5
+    color: "#ADFF2F", // Màu xanh vàng để hiển thị thông tin chỉ số
+    marginBottom: 5,
   },
   score: {
     fontSize: 18,
-    color: '#FF6347', // Màu cà chua để làm nổi bật tình trạng tài chính
-    marginBottom: 20
-  }
+    color: "#FF6347", // Màu cà chua để làm nổi bật tình trạng tài chính
+    marginBottom: 20,
+  },
 });
 
 export default EndGame;

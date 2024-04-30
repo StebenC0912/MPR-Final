@@ -40,8 +40,6 @@ const MainScreen = ({ navigation, route }) => {
 
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
- 
-
   const { stats, incrementAge, dispatch } = useStats();
   const { name } = route.params;
 
@@ -125,7 +123,7 @@ const MainScreen = ({ navigation, route }) => {
         [
           {
             text: "View Score",
-            onPress: () => navigation.navigate("EndGame"), // Giả sử bạn đã thiết lập màn hình EndGame trong định tuyến của mình
+            onPress: () => navigation.navigate("EndGame", { uid: uid }), // Giả sử bạn đã thiết lập màn hình EndGame trong định tuyến của mình
           },
         ],
         { cancelable: false }
