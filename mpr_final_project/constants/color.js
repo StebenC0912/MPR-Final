@@ -10,6 +10,9 @@ export const color = {
       pink: '#e91e63',
       gray94: '#f0f0f0',
       darkBlue: '#34495e',
+      red: "#FF6347",
+      darkYellow: "#FFD700",
+      lightPink: "#FFC0CB"
     },
   };
   
